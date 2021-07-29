@@ -108,8 +108,8 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
         global pxdf2
         global genelistfinal
 
-        url1 = 'https://media.githubusercontent.com/media/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_1.csv'
-        url2 = 'https://media.githubusercontent.com/media/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_2.csv'
+        url1 = 'https://raw.githubusercontent.com/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_1.csv'
+        url2 = 'https://raw.githubusercontent.com/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_2.csv'
         pxdf1 = pd.read_table(url1, sep = ',', index_col=0)
         pxdf2 = pd.read_table(url2, sep = ',', index_col=0)
         
@@ -127,12 +127,12 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
         first = False
     
     else:
-        urlcheck1 = 'https://media.githubusercontent.com/media/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_1.csv'
+        urlcheck1 = 'https://raw.githubusercontent.com/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_1.csv'
         if urlcheck1 == url1:
             pass
         else:
-            url1 = 'https://media.githubusercontent.com/media/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_1.csv'
-            url2 = 'https://media.githubusercontent.com/media/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_2.csv'
+            url1 = 'https://raw.githubusercontent.com/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_1.csv'
+            url2 = 'https://raw.githubusercontent.com/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_2.csv'
             pxdf1 = pd.read_table(url1, sep = ',', index_col=0)
             pxdf2 = pd.read_table(url2, sep = ',', index_col=0)
             
