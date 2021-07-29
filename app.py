@@ -203,7 +203,7 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
 
     pxfig.layout.xaxis.title = "Time"
     pxfig.layout.yaxis.title = "Mutation Prevalence (%)"
-    #pxfig.layout.yaxis1.type = selected_y_scale
+    pxfig.layout.yaxis1.type = selected_y_scale
     pxfig.layout.yaxis2.title = "Total Number of Sequences"
     pxfig.layout.update(title={
                             'text' : 'Mutation prevalence over time',
