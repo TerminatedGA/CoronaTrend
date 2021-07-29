@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
 import plotly.express as px
 from plotly.subplots import make_subplots
 import natsort
@@ -12,6 +6,8 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import pandas as pd
+
+first = True
 
 lineagedict = dict(zip(['All Sequences', 'B.1.1.7','B.1.1.63', 'B.1.36', 'B.1.351', 'B.1.427', 'B.1.525', 'B.1.526', 'B.1.620', 'B.1.621', 'B.1.617.1', 'B.1.617.2', 'C.37', 'P.1', 'P.2'],
                        ['All', 'B117','B1163', 'B136', 'B1351', 'B1427', 'B1525', 'B1526', 'B1620', 'B1621', 'B16171', 'B16172', 'C37', 'P1', 'P2']))
@@ -97,65 +93,84 @@ def update_output(value):
     [Input('change-slider', 'value'), Input('change-radio', 'value'), Input('init-slider', 'value'), Input('gene-dropdown', 'value'), Input('mut-input', 'value'), Input('change-mut', 'value'), Input('lineage-dropdown', 'value')])
 def multiple_output(selected_change_slider, selected_change_radio, selected_init, selected_gene, search_mut, mut_radio, selected_lineage):
     #Update figure with user selection
-    
-    
-    url1 = 'https://media.githubusercontent.com/media/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_1.csv'
-    url2 = 'https://media.githubusercontent.com/media/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_2.csv'
-    pxdf1 = pd.read_table(url1, sep = ',', index_col=0)
-    pxdf2 = pd.read_table(url2, sep = ',', index_col=0)
-    
-    percentagelistlist1 = [[float(b) for b in a] for a in [[i.strip() for i in a[1:-1].replace('"',"").split(',')] for a in pxdf1['Percentage by period']]]
-    pxdf1['Percentage by period'] = percentagelistlist1
+    global first
+    if first == True:
+        global url1
+        global url2
+        global pxdf1
+        global pxdf2
+        global genelistfinal
 
-    periodlist1repeats = len(pxdf1['Mutations'])
-    genelistfinal = natsort.natsorted(set(pxdf1['Gene']))
-    genelistfinal.insert(0, "All")
-    pxdf1 = pxdf1.explode('Percentage by period')
-    pxdf1['Periods'] = list(pxdf2['Periods']) * periodlist1repeats
+        url1 = 'https://media.githubusercontent.com/media/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_1.csv'
+        url2 = 'https://media.githubusercontent.com/media/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_2.csv'
+        pxdf1 = pd.read_table(url1, sep = ',', index_col=0)
+        pxdf2 = pd.read_table(url2, sep = ',', index_col=0)
+        
+        percentagelistlist1 = [[float(b) for b in a] for a in [[i.strip() for i in a[1:-1].replace('"',"").split(',')] for a in pxdf1['Percentage by period']]]
+        pxdf1['Percentage by period'] = percentagelistlist1
+
+        periodlist1repeats = len(pxdf1['Mutations'])
+        genelistfinal = natsort.natsorted(set(pxdf1['Gene']))
+        genelistfinal.insert(0, "All")
+        pxdf1 = pxdf1.explode('Percentage by period')
+        pxdf1['Periods'] = list(pxdf2['Periods']) * periodlist1repeats
+
+        pxdf1['AA Label'] = pxdf1['Gene'] + ": " + pxdf1['AA Mutations']
+
+        first = False
+    
+    else:
+        urlcheck1 = 'https://media.githubusercontent.com/media/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_1.csv'
+        if urlcheck1 == url1:
+            pass
+        if urlcheck1 != url1:
+            url1 = 'https://media.githubusercontent.com/media/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_1.csv'
+            url2 = 'https://media.githubusercontent.com/media/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_2.csv'
+            pxdf1 = pd.read_table(url1, sep = ',', index_col=0)
+            pxdf2 = pd.read_table(url2, sep = ',', index_col=0)
+            
+            percentagelistlist1 = [[float(b) for b in a] for a in [[i.strip() for i in a[1:-1].replace('"',"").split(',')] for a in pxdf1['Percentage by period']]]
+            pxdf1['Percentage by period'] = percentagelistlist1
+
+            periodlist1repeats = len(pxdf1['Mutations'])
+            genelistfinal = natsort.natsorted(set(pxdf1['Gene']))
+            genelistfinal.insert(0, "All")
+            pxdf1 = pxdf1.explode('Percentage by period')
+            pxdf1['Periods'] = list(pxdf2['Periods']) * periodlist1repeats
+
+            pxdf1['AA Label'] = pxdf1['Gene'] + ": " + pxdf1['AA Mutations']
     
     if search_mut is not None:
         search_mut = search_mut.upper()
-    if selected_gene == "All":
-        if selected_change_radio == 'all':
-            changecolumn = 'Change in prevalence (All)(%)'
-        else:
-            changecolumn = 'Change in prevalence (Fin - Start)(%)'
-        if mut_radio == 'nuclmut':
-            mutcolumn = 'Mutations'
-        else:
-            mutcolumn = 'AA Mutations'
-        if search_mut is None or search_mut == '':
-            searchmut = (pxdf1[mutcolumn] != None)
-        else: 
-            searchmut = (pxdf1[mutcolumn].str.contains(search_mut)) 
-        filtered_pxdf1 = pxdf1[(pxdf1[changecolumn] >= selected_change_slider) & 
-                               (pxdf1['Initial prevalence'] >= selected_init[0]) & 
-                               (pxdf1['Initial prevalence'] <= selected_init[1]) & 
-                               searchmut]
+    
+    if selected_change_radio == 'all':
+        changecolumn = 'Change in prevalence (All)(%)'
     else:
-        if selected_change_radio == 'all':
-            changecolumn = 'Change in prevalence (All)(%)'
-        else:
-            changecolumn = 'Change in prevalence (Fin - Start)(%)'
-        if mut_radio == 'nuclmut':
-            mutcolumn = 'Mutations'
-        else:
-            mutcolumn = 'AA Mutations'
-        if search_mut is None or search_mut == '':
-            searchmut = (pxdf1[mutcolumn] != None)
-        else: 
-            searchmut = (pxdf1[mutcolumn].str.contains(search_mut))
-        filtered_pxdf1 = pxdf1[(pxdf1[changecolumn] >= selected_change_slider) & 
-                               (pxdf1['Initial prevalence'] >= selected_init[0]) & 
-                               (pxdf1['Initial prevalence'] <= selected_init[1]) &
-                               (pxdf1['Gene'] == selected_gene) &
-                               searchmut]
+        changecolumn = 'Change in prevalence (Fin - Start)(%)'
+    if mut_radio == 'nuclmut':
+        mutcolumn = 'Mutations'
+    else:
+        mutcolumn = 'AA Label'
+    if search_mut is None or search_mut == '':
+        searchmut = (pxdf1[mutcolumn] != None)
+    else: 
+        searchmut = (pxdf1[mutcolumn].str.upper.contains(search_mut)) 
+    if selected_gene == "All":
+        selectedgene = (pxdf1['Gene'] != None)
+    else:
+        selectedgene = (pxdf1['Gene'] == selected_gene)
+
+    filtered_pxdf1 = pxdf1[(pxdf1[changecolumn] >= selected_change_slider) & 
+                           (pxdf1['Initial prevalence'] >= selected_init[0]) & 
+                           (pxdf1['Initial prevalence'] <= selected_init[1]) &
+                           selectedgene &
+                           searchmut]
         
     #Create new mutation suggestion list
     if mut_radio == 'nuclmut':
         mutsuggestlist = natsort.natsorted(set(filtered_pxdf1['Mutations']))
     else:
-        mutsuggestlist = natsort.natsorted(set(filtered_pxdf1['AA Mutations']))
+        mutsuggestlist = natsort.natsorted(set(filtered_pxdf1['AA Label']))
     
     #Create figures from dataframes, then combine both together
     fig1 = px.line(filtered_pxdf1,
@@ -194,4 +209,3 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
 
 if __name__ == '__main__':
     app.run_server()
-
