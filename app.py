@@ -6,6 +6,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import pandas as pd
+from jupyter_dash import JupyterDash
 
 first = True
 
@@ -14,7 +15,7 @@ lineagedict = dict(zip(['All Sequences', 'B.1.1.7','B.1.1.63', 'B.1.36', 'B.1.35
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = JupyterDash(__name__, external_stylesheets=external_stylesheets)
 
 server = app.server
 
@@ -26,6 +27,13 @@ app.layout = html.Div([
         children=[
             dcc.Graph(id='mutation-chart', style={'height': '100vh'})]), style={'width': '78vw', 'display': 'inline-block', 'vertical-align': 'top'}),
     html.Div([
+        html.Div('Viewing Options', 
+        style={'color': 'black', 'fontSize': 20, 'font-weight': 'bold'}),
+        dcc.RadioItems(id='y-scale',
+                   options=[{'label': 'Linear Primary Y-axis', 'value': "linear"},
+                            {'label': 'Log Primary Y-axis', 'value': "log"}],
+                   value="linear",
+                   style={'fontSize': 13}),
         html.Div('Filters', 
         style={'color': 'black', 'fontSize': 20, 'font-weight': 'bold'}),
         html.Div('Filter by lineage using dropdown:', 
@@ -90,8 +98,8 @@ def update_output(value):
 
 @app.callback(
     [Output('mutation-chart', 'figure'), Output('mut-suggestion', 'children'), Output('gene-dropdown', 'options')],
-    [Input('change-slider', 'value'), Input('change-radio', 'value'), Input('init-slider', 'value'), Input('gene-dropdown', 'value'), Input('mut-input', 'value'), Input('change-mut', 'value'), Input('lineage-dropdown', 'value')])
-def multiple_output(selected_change_slider, selected_change_radio, selected_init, selected_gene, search_mut, mut_radio, selected_lineage):
+    [Input('change-slider', 'value'), Input('change-radio', 'value'), Input('init-slider', 'value'), Input('gene-dropdown', 'value'), Input('mut-input', 'value'), Input('change-mut', 'value'), Input('lineage-dropdown', 'value'), Input('y-scale', 'value')])
+def multiple_output(selected_change_slider, selected_change_radio, selected_init, selected_gene, search_mut, mut_radio, selected_lineage, selected_y_scale):
     #Update figure with user selection
     global first
     if first == True:
@@ -123,7 +131,7 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
         urlcheck1 = 'https://media.githubusercontent.com/media/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_1.csv'
         if urlcheck1 == url1:
             pass
-        if urlcheck1 != url1:
+        else:
             url1 = 'https://media.githubusercontent.com/media/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_1.csv'
             url2 = 'https://media.githubusercontent.com/media/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_2.csv'
             pxdf1 = pd.read_table(url1, sep = ',', index_col=0)
@@ -196,7 +204,7 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
 
     pxfig.layout.xaxis.title = "Time"
     pxfig.layout.yaxis.title = "Mutation Prevalence (%)"
-    #pxfig.layout.yaxis1.type="log"
+    #pxfig.layout.yaxis1.type = selected_y_scale
     pxfig.layout.yaxis2.title = "Total Number of Sequences"
     pxfig.layout.update(title={
                             'text' : 'Mutation prevalence over time',
