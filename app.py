@@ -6,15 +6,16 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import pandas as pd
+from jupyter_dash import JupyterDash
 
 first = True
 
 lineagedict = dict(zip(['All Sequences', 'B.1.1.7','B.1.1.63', 'B.1.36', 'B.1.351', 'B.1.427', 'B.1.525', 'B.1.526', 'B.1.620', 'B.1.621', 'B.1.617.1', 'B.1.617.2', 'C.37', 'P.1', 'P.2'],
-                       ['All', 'B117','B1163', 'B136', 'B1351', 'B1427', 'B1525', 'B1526', 'B1620', 'B1621', 'B16171', 'B16172', 'C37', 'P1', 'P2']))
+                       ['All', 'B117', 'B1163', 'B136', 'B1351', 'B1427', 'B1525', 'B1526', 'B1620', 'B1621', 'B16171', 'B16172', 'C37', 'P1', 'P2']))
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = JupyterDash(__name__, external_stylesheets=external_stylesheets)
 
 server = app.server
 
@@ -40,7 +41,7 @@ app.layout = html.Div([
         dcc.Dropdown(
         id='lineage-dropdown',
         options=[{'label': list(lineagedict.keys())[x], 'value': list(lineagedict.values())[x]} for x in range(len(lineagedict))],
-        value="All",
+        value="B136",
         clearable=False),
         html.Hr(style={'borderColor': '#828282'}),
         dcc.Input(id="mut-input", 
@@ -108,13 +109,10 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
         global pxdf2
         global genelistfinal
 
-        url1 = 'https://raw.githubusercontent.com/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_1.csv'
-        url2 = 'https://raw.githubusercontent.com/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_2.csv'
-        pxdf1 = pd.read_table(url1, sep = ',', index_col=0)
-        pxdf2 = pd.read_table(url2, sep = ',', index_col=0)
-        
-        percentagelistlist1 = [[float(b) for b in a] for a in [[i.strip() for i in a[1:-1].replace('"',"").split(',')] for a in pxdf1['Percentage by period']]]
-        pxdf1['Percentage by period'] = percentagelistlist1
+        url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.pkl?raw=true'
+        url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_2.pkl?raw=true'
+        pxdf1 = pd.read_pickle(url1)
+        pxdf2 = pd.read_pickle(url2)
 
         periodlist1repeats = len(pxdf1['Mutations'])
         genelistfinal = natsort.natsorted(set(pxdf1['Gene']))
@@ -122,30 +120,23 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
         pxdf1 = pxdf1.explode('Percentage by period')
         pxdf1['Periods'] = list(pxdf2['Periods']) * periodlist1repeats
 
-        pxdf1['AA Label'] = pxdf1['Gene'] + ": " + pxdf1['AA Mutations']
-
         first = False
     
     else:
-        urlcheck1 = 'https://raw.githubusercontent.com/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_1.csv'
+        urlcheck1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.pkl?raw=true'
         if urlcheck1 == url1:
             pass
         else:
-            url1 = 'https://raw.githubusercontent.com/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_1.csv'
-            url2 = 'https://raw.githubusercontent.com/TerminatedGA/GISAID-Dataframes/master/' + selected_lineage + '_2.csv'
-            pxdf1 = pd.read_table(url1, sep = ',', index_col=0)
-            pxdf2 = pd.read_table(url2, sep = ',', index_col=0)
+            url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.pkl?raw=true'
+            url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_2.pkl?raw=true'
+            pxdf1 = pd.read_pickle(url1)
+            pxdf2 = pd.read_pickle(url2)
             
-            percentagelistlist1 = [[float(b) for b in a] for a in [[i.strip() for i in a[1:-1].replace('"',"").split(',')] for a in pxdf1['Percentage by period']]]
-            pxdf1['Percentage by period'] = percentagelistlist1
-
             periodlist1repeats = len(pxdf1['Mutations'])
             genelistfinal = natsort.natsorted(set(pxdf1['Gene']))
             genelistfinal.insert(0, "All")
             pxdf1 = pxdf1.explode('Percentage by period')
             pxdf1['Periods'] = list(pxdf2['Periods']) * periodlist1repeats
-
-            pxdf1['AA Label'] = pxdf1['Gene'] + ": " + pxdf1['AA Mutations']
     
     if search_mut is not None:
         search_mut = search_mut.upper()
