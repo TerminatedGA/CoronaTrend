@@ -151,7 +151,7 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
     if search_mut is None or search_mut == '':
         searchmut = (pxdf1[mutcolumn] != None)
     else: 
-        searchmut = (pxdf1[mutcolumn].str.upper.contains(search_mut)) 
+        searchmut = (pxdf1[mutcolumn].str.contains(search_mut, case=False)) 
     if selected_gene == "All":
         selectedgene = (pxdf1['Gene'] != None)
     else:
