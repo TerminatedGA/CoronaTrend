@@ -108,10 +108,10 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
         global pxdf2
         global genelistfinal
 
-        url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.pkl?raw=true'
-        url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_2.pkl?raw=true'
-        pxdf1 = pd.read_pickle(url1)
-        pxdf2 = pd.read_pickle(url2)
+        url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.feather?raw=true'
+        url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_2.feather?raw=true'
+        pxdf1 = pd.read_feather(url1)
+        pxdf2 = pd.read_feather(url2)
 
         periodlist1repeats = len(pxdf1['Mutations'])
         genelistfinal = natsort.natsorted(set(pxdf1['Gene']))
@@ -122,14 +122,14 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
         first = False
     
     else:
-        urlcheck1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.pkl?raw=true'
+        urlcheck1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.feather?raw=true'
         if urlcheck1 == url1:
             pass
         else:
-            url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.pkl?raw=true'
-            url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_2.pkl?raw=true'
-            pxdf1 = pd.read_pickle(url1)
-            pxdf2 = pd.read_pickle(url2)
+            url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.feather?raw=true'
+            url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_2.feather?raw=true'
+            pxdf1 = pd.read_feather(url1)
+            pxdf2 = pd.read_feather(url2)
             
             periodlist1repeats = len(pxdf1['Mutations'])
             genelistfinal = natsort.natsorted(set(pxdf1['Gene']))
