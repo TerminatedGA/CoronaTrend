@@ -6,6 +6,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import pandas as pd
+from collections import Counter
 
 first = True
 
@@ -19,13 +20,31 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
 
 app.layout = html.Div([
+    html.Div('CoronaTrend', 
+        style={'color': 'black', 'fontSize': 25, 'font-weight': 'bold'}),
     html.Datalist(id='mut-suggestion', 
                   children=[html.Option(value=word) for word in []]),
-    html.Div(dcc.Loading(
-        id='loading',
-        children=[
-            dcc.Graph(id='mutation-chart', style={'height': '100vh'})]), style={'width': '78vw', 'display': 'inline-block', 'vertical-align': 'top'}),
+    html.Div(children=dcc.Tabs([
+            #Graph 1: Mutation graph
+            dcc.Tab(label='Mutation graph', 
+                    children=[dcc.Loading(
+                                id='loading-mutation-chart',
+                                children=[dcc.Graph(id='mutation-chart', 
+                                                    style={'height': '90vh'})])]),
+            #Graph 2: Gene Pie Chart
+            dcc.Tab(label='Gene Pie Chart',
+                    children=[dcc.Loading(
+                                id='loading-pie-chart',
+                                children=[dcc.Graph(id='pie-chart', 
+                                        style={'height': '90vh'})])])],
+            style={'height': '10vh'}),
+            style={'width': '78vw', 'display': 'inline-block', 'vertical-align': 'top'}),
     html.Div([
+        html.Div(
+            children=[html.Div('Enabled by data from', 
+                               style={'color': 'black', 'fontSize': 12, 'display': 'inline-block', 'marginRight': 5}),
+                      html.Img(src=app.get_asset_url('images/GISAID.png'),
+                               style={'width': '20%', 'display': 'inline-block'})]),      
         html.Div('Viewing Options', 
         style={'color': 'black', 'fontSize': 20, 'font-weight': 'bold'}),
         dcc.RadioItems(id='y-scale',
@@ -55,33 +74,32 @@ app.layout = html.Div([
         html.Hr(style={'borderColor': '#828282'}),
         html.Div('Filter by gene using dropdown:', 
         style={'color': 'black', 'fontSize': 15}),
-    dcc.Dropdown(
-        id='gene-dropdown',
-        options=[{'label': x, 'value': x} for x in ["placeholder_text"]],
-        value="All",
-        clearable=False),
-    html.Hr(style={'borderColor': '#828282'}),
-    html.Div(id='change-slider-container'),
-    dcc.RadioItems(id='change-radio',
-                   options=[{'label': '(Final - Initial)', 'value': 'fin'},
-                            {'label': 'All-time', 'value': 'all'}],
-                   value='fin',
-                   style={'fontSize': 13}),
-    html.Div([dcc.Slider(id='change-slider',
-           min=0,
-           max=100,
-           value=10,
-           step=0.5)],
-           style={'padding-bottom': 0.5}),
-    html.Hr(style={'borderColor': '#828282'}),
-    html.Div(id='init-slider-container-min'),
-    html.Div(id='init-slider-container-max'),
-    html.Div([dcc.RangeSlider(id='init-slider',
+        dcc.Dropdown(
+            id='gene-dropdown',
+            options=[{'label': x, 'value': x} for x in ["placeholder_text"]],
+            value="All",
+            clearable=False),
+        html.Hr(style={'borderColor': '#828282'}),
+        html.Div(id='change-slider-container'),
+        dcc.RadioItems(id='change-radio',
+                       options=[{'label': '(Final - Initial)', 'value': 'fin'},
+                                {'label': 'All-time', 'value': 'all'}],
+                       value='fin',
+                       style={'fontSize': 13}),
+        html.Div([dcc.Slider(id='change-slider',
                min=0,
                max=100,
-               value=[0, 100],
-               step=0.5)])], 
-    style={'width': '18vw', 'display': 'inline-block', 'vertical-align': 'top', 'borderLeftStyle': 'solid', 'padding-left': 10, 'borderColor': '#828282'})])
+               value=10,
+               step=0.5)]),
+        html.Hr(style={'borderColor': '#828282'}),
+        html.Div(id='init-slider-container-min'),
+        html.Div(id='init-slider-container-max'),
+        html.Div([dcc.RangeSlider(id='init-slider',
+                   min=0,
+                   max=100,
+                   value=[0, 100],
+                   step=0.5)])], 
+        style={'width': '18vw', 'display': 'inline-block', 'vertical-align': 'top', 'borderLeftStyle': 'solid', 'padding-left': 10, 'borderColor': '#828282'})])
 
 @app.callback(
     Output('change-slider-container', 'children'),
@@ -96,7 +114,7 @@ def update_output(value):
     return 'Minimum inital prevalence: {}%'.format(value[0]), 'Maximum inital prevalence: {}%'.format(value[1])
 
 @app.callback(
-    [Output('mutation-chart', 'figure'), Output('mut-suggestion', 'children'), Output('gene-dropdown', 'options')],
+    [Output('mutation-chart', 'figure'), Output('pie-chart', 'figure'), Output('mut-suggestion', 'children'), Output('gene-dropdown', 'options')],
     [Input('change-slider', 'value'), Input('change-radio', 'value'), Input('init-slider', 'value'), Input('gene-dropdown', 'value'), Input('mut-input', 'value'), Input('change-mut', 'value'), Input('lineage-dropdown', 'value'), Input('y-scale', 'value')])
 def multiple_output(selected_change_slider, selected_change_radio, selected_init, selected_gene, search_mut, mut_radio, selected_lineage, selected_y_scale):
     #Update figure with user selection
@@ -106,12 +124,15 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
         global url2
         global pxdf1
         global pxdf2
+        global piedf1
         global genelistfinal
 
-        url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.feather?raw=true'
-        url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_2.feather?raw=true'
-        pxdf1 = pd.read_feather(url1)
-        pxdf2 = pd.read_feather(url2)
+        file1 = 'assets/dataframes/' + selected_lineage + '_1.feather'
+        file2 = 'assets/dataframes/' + selected_lineage + '_2.feather'
+        pxdf1 = pd.read_feather(file1)
+        pxdf2 = pd.read_feather(file2)
+        
+        piedf1 = pxdf1
 
         periodlist1repeats = len(pxdf1['Mutations'])
         genelistfinal = natsort.natsorted(set(pxdf1['Gene']))
@@ -122,14 +143,16 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
         first = False
     
     else:
-        urlcheck1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.feather?raw=true'
-        if urlcheck1 == url1:
+        urlcheck1 = 'assets/dataframes/' + selected_lineage + '_2.feather'
+        if urlcheck1 == file1:
             pass
         else:
-            url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.feather?raw=true'
-            url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_2.feather?raw=true'
-            pxdf1 = pd.read_feather(url1)
-            pxdf2 = pd.read_feather(url2)
+            file1 = 'assets/dataframes/' + selected_lineage + '_1.feather'
+            file2 = 'assets/dataframes/' + selected_lineage + '_2.feather'
+            pxdf1 = pd.read_feather(file1)
+            pxdf2 = pd.read_feather(file2)
+            
+            piedf1 = pxdf1
             
             periodlist1repeats = len(pxdf1['Mutations'])
             genelistfinal = natsort.natsorted(set(pxdf1['Gene']))
@@ -150,18 +173,29 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
         mutcolumn = 'AA Label'
     if search_mut is None or search_mut == '':
         searchmut = (pxdf1[mutcolumn] != None)
+        searchmutpie = (piedf1[mutcolumn] != None)
     else: 
         searchmut = (pxdf1[mutcolumn].str.contains(search_mut, case=False)) 
+        searchmutpie = (piedf1[mutcolumn].str.contains(search_mut, case=False)) 
     if selected_gene == "All":
         selectedgene = (pxdf1['Gene'] != None)
+        selectedgenepie = (piedf1['Gene'] != None)
     else:
         selectedgene = (pxdf1['Gene'] == selected_gene)
+        selectedgenepie = (piedf1['Gene'] == selected_gene)
 
     filtered_pxdf1 = pxdf1[(pxdf1[changecolumn] >= selected_change_slider) & 
                            (pxdf1['Initial prevalence'] >= selected_init[0]) & 
                            (pxdf1['Initial prevalence'] <= selected_init[1]) &
                            selectedgene &
                            searchmut]
+    filtered_piedf1 =  piedf1[(piedf1[changecolumn] >= selected_change_slider) & 
+                           (piedf1['Initial prevalence'] >= selected_init[0]) & 
+                           (piedf1['Initial prevalence'] <= selected_init[1]) &
+                           selectedgenepie &
+                           searchmutpie]
+    
+    piedict = Counter(filtered_piedf1['Gene'])
         
     #Create new mutation suggestion list
     if mut_radio == 'nuclmut':
@@ -187,22 +221,32 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
 
     fig2.update_traces(yaxis="y2", line = {'color': '#456987', 'dash': "dot", 'width': 4})
 
-    pxfig = make_subplots(specs=[[{"secondary_y": True}]])
+    pxfig1 = make_subplots(specs=[[{"secondary_y": True}]])
 
-    pxfig.add_traces(fig2.data + fig1.data)
+    pxfig1.add_traces(fig2.data + fig1.data)
 
-    pxfig.layout.xaxis.title = "Time"
-    pxfig.layout.yaxis.title = "Mutation Prevalence (%)"
-    pxfig.layout.yaxis1.type = selected_y_scale
-    pxfig.layout.yaxis2.title = "Total Number of Sequences"
-    pxfig.layout.update(title={
+    pxfig1.layout.xaxis.title = "Time"
+    pxfig1.layout.yaxis.title = "Mutation Prevalence (%)"
+    pxfig1.layout.yaxis1.type = selected_y_scale
+    pxfig1.layout.yaxis2.title = "Total Number of Sequences"
+    pxfig1.layout.update(title={
                             'text' : 'Mutation prevalence over time',
                             'x':0.5,
                             'xanchor': 'center'}, 
                         template = 'plotly_white')
+    
+    piefig1 = px.pie(filtered_piedf1, 
+                    names=piedict.keys(),
+                    values=piedict.values())
+    
+    piefig1.update_traces(hovertemplate='<b>Gene: %{label}</b><br>Percentage: %{percent}<br>Count: %{value}')
+    piefig1.layout.update(title={
+                            'text' : 'Mutations Grouped by Genes',
+                            'x':0.5,
+                            'xanchor': 'center'}, 
+                        template = 'plotly_white')
 
-    fig1.update_layout(transition_duration=1000)
-    return pxfig, [html.Option(value=word) for word in mutsuggestlist], [{'label': x, 'value': x} for x in genelistfinal]
+    return pxfig1, piefig1, [html.Option(value=word) for word in mutsuggestlist], [{'label': x, 'value': x} for x in genelistfinal]
 
 if __name__ == '__main__':
     app.run_server()
