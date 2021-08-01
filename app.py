@@ -22,6 +22,11 @@ server = app.server
 app.layout = html.Div([
     html.Div('CoronaTrend', 
         style={'color': 'black', 'fontSize': 25, 'font-weight': 'bold'}),
+    html.Div(
+            children=[html.Div('Enabled by data from', 
+                               style={'color': 'black', 'fontSize': 14, 'display': 'inline-block', 'marginRight': 5}),
+                      html.Img(src=app.get_asset_url('images/GISAID.png'),
+                               style={'width': '3%', 'display': 'inline-block'})]),  
     html.Datalist(id='mut-suggestion', 
                   children=[html.Option(value=word) for word in []]),
     html.Div(children=dcc.Tabs([
@@ -39,12 +44,7 @@ app.layout = html.Div([
                                         style={'height': '90vh'})])])],
             style={'height': '10vh'}),
             style={'width': '78vw', 'display': 'inline-block', 'vertical-align': 'top'}),
-    html.Div([
-        html.Div(
-            children=[html.Div('Enabled by data from', 
-                               style={'color': 'black', 'fontSize': 12, 'display': 'inline-block', 'marginRight': 5}),
-                      html.Img(src=app.get_asset_url('images/GISAID.png'),
-                               style={'width': '20%', 'display': 'inline-block'})]),      
+    html.Div([    
         html.Div('Viewing Options', 
         style={'color': 'black', 'fontSize': 20, 'font-weight': 'bold'}),
         dcc.RadioItems(id='y-scale',
