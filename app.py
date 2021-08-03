@@ -146,8 +146,8 @@ def multiple_output(selected_change_slider,
         global piedf1
         global genelistfinal
 
-        url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.feather?raw=true'
-        url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_2.feather?raw=true'
+        url1 = 'assets/gisaid-dataframes/' + selected_lineage + '_1.feather'
+        url2 = 'assets/gisaid-dataframes/' + selected_lineage + '_2.feather'
         pxdf1 = pd.read_feather(url1)
         pxdf2 = pd.read_feather(url2)
         
@@ -162,12 +162,12 @@ def multiple_output(selected_change_slider,
         first = False
     
     else:
-        urlcheck1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.feather?raw=true'
+        urlcheck1 = 'assets/gisaid-dataframes/' + selected_lineage + '_1.feather'
         if urlcheck1 == url1:
             pass
         else:
-            url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.feather?raw=true'
-            url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_2.feather?raw=true'
+            url1 = 'assets/gisaid-dataframes/' + selected_lineage + '_1.feather'
+            url2 = 'assets/gisaid-dataframes/' + selected_lineage + '_2.feather'
             pxdf1 = pd.read_feather(url1)
             pxdf2 = pd.read_feather(url2)
             
