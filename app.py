@@ -3,8 +3,9 @@ from plotly.subplots import make_subplots
 import natsort
 import dash
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import pandas as pd
 from collections import Counter
 
@@ -26,10 +27,10 @@ app.layout = html.Div([
             children=[html.Div('Enabled by data from', 
                                style={'color': 'black', 'fontSize': 14, 'display': 'inline-block', 'marginRight': 5}),
                       html.Img(src=app.get_asset_url('images/GISAID.png'),
-                               style={'width': '3%', 'display': 'inline-block'})]),  
+                               style={'width': 30, 'display': 'inline-block'})]),  
     html.Datalist(id='mut-suggestion', 
                   children=[html.Option(value=word) for word in []]),
-    html.Div(children=dcc.Tabs([
+    html.Div(children=[dcc.Tabs([
             #Graph 1: Mutation graph
             dcc.Tab(label='Mutation graph', 
                     children=[dcc.Loading(
@@ -42,7 +43,7 @@ app.layout = html.Div([
                                 id='loading-pie-chart',
                                 children=[dcc.Graph(id='pie-chart', 
                                         style={'height': '90vh'})])])],
-            style={'height': '10vh'}),
+            style={'height': 60})],
             style={'width': '78vw', 'display': 'inline-block', 'vertical-align': 'top'}),
     html.Div([    
         html.Div('Viewing Options', 
@@ -108,15 +109,33 @@ def update_output(value):
     return 'Minimum change in prevalence: {}%'.format(value)
 
 @app.callback(
-    [Output('init-slider-container-min', 'children'), Output('init-slider-container-max', 'children')],
+    [Output('init-slider-container-min', 'children'), 
+     Output('init-slider-container-max', 'children')],
     [Input('init-slider', 'value')])
 def update_output(value):
     return 'Minimum inital prevalence: {}%'.format(value[0]), 'Maximum inital prevalence: {}%'.format(value[1])
 
 @app.callback(
-    [Output('mutation-chart', 'figure'), Output('pie-chart', 'figure'), Output('mut-suggestion', 'children'), Output('gene-dropdown', 'options')],
-    [Input('change-slider', 'value'), Input('change-radio', 'value'), Input('init-slider', 'value'), Input('gene-dropdown', 'value'), Input('mut-input', 'value'), Input('change-mut', 'value'), Input('lineage-dropdown', 'value'), Input('y-scale', 'value')])
-def multiple_output(selected_change_slider, selected_change_radio, selected_init, selected_gene, search_mut, mut_radio, selected_lineage, selected_y_scale):
+    [Output('mutation-chart', 'figure'), 
+     Output('pie-chart', 'figure'), 
+     Output('mut-suggestion', 'children'), 
+     Output('gene-dropdown', 'options')],
+    [Input('change-slider', 'value'), 
+     Input('change-radio', 'value'), 
+     Input('init-slider', 'value'), 
+     Input('gene-dropdown', 'value'), 
+     Input('mut-input', 'value'), 
+     Input('change-mut', 'value'), 
+     Input('lineage-dropdown', 'value'), 
+     Input('y-scale', 'value')])
+def multiple_output(selected_change_slider, 
+                    selected_change_radio, 
+                    selected_init, 
+                    selected_gene, 
+                    search_mut, 
+                    mut_radio, 
+                    selected_lineage, 
+                    selected_y_scale):
     #Update figure with user selection
     global first
     if first == True:
@@ -197,13 +216,13 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
     
     piedict = Counter(filtered_piedf1['Gene'])
         
-    #Create new mutation suggestion list
+    #Create new mutation suggestion list for search bar
     if mut_radio == 'nuclmut':
         mutsuggestlist = natsort.natsorted(set(filtered_pxdf1['Mutations']))
     else:
         mutsuggestlist = natsort.natsorted(set(filtered_pxdf1['AA Label']))
     
-    #Create figures from dataframes, then combine both together
+    #Create mutation chart from dataframe 1
     fig1 = px.line(filtered_pxdf1,
                 x = 'Periods',
                 y = 'Percentage by period', 
@@ -211,6 +230,7 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
                 custom_data = [filtered_pxdf1['Labels']])
     fig1.update_traces(hovertemplate='<b>%{customdata[0]}</b><br><br>Week: %{x}<br>Prevalence: %{y}'+'%'+'<extra></extra>')
     
+    #Create chart showing sample size of sequence in each time point 
     fig2 = px.line(pxdf2, 
                 x = 'Periods',
                 y = 'Totals',
@@ -221,6 +241,7 @@ def multiple_output(selected_change_slider, selected_change_radio, selected_init
 
     fig2.update_traces(yaxis="y2", line = {'color': '#456987', 'dash': "dot", 'width': 4})
 
+    #Combine both graphs together
     pxfig1 = make_subplots(specs=[[{"secondary_y": True}]])
 
     pxfig1.add_traces(fig2.data + fig1.data)
