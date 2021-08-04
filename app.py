@@ -28,8 +28,10 @@ app.layout = html.Div([
     html.Div(
             children=[html.Div('Enabled by data from', 
                                style={'color': 'black', 'fontSize': 14, 'display': 'inline-block', 'marginRight': 5}),
-                      html.Img(src=app.get_asset_url('images/GISAID.png'),
-                               style={'width': 30, 'display': 'inline-block'})]),  
+                      html.A(href="https://www.gisaid.org/",
+                             target='_blank',
+                             children=[html.Img(src=app.get_asset_url('images/GISAID.png'),
+                                                style={'width': 35, 'display': 'inline-block'})])]),  
     html.Datalist(id='mut-suggestion', 
                   children=[html.Option(value=word) for word in []]),
     html.Div(children=[dcc.Tabs([
