@@ -175,6 +175,7 @@ def multiple_output(selected_change_slider,
         else:
             url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.feather?raw=true'
             url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_2.feather?raw=true'
+            pxdf1 = pd.read_feather(url1)
             pxdf2 = pd.read_feather(url2)
             
             piedf1 = pxdf1
