@@ -16,7 +16,9 @@ lineagedict = dict(zip(['All Sequences', 'B.1.1.7','B.1.1.63', 'B.1.36', 'B.1.35
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets, update_title='CoronaTrend - Loading')
+
+app.title = "CoronaTrend"
 
 server = app.server
 
