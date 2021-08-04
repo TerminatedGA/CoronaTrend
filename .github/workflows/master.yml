@@ -16,5 +16,5 @@ jobs:
       uses: vitalyliber/dokku-github-action@v6.1
       env:
         PRIVATE_KEY: ${{ secrets.CORONAKEY }}
-        HOST: dokku@157.230.195.60
+        HOST: 157.230.195.60
         PROJECT: coronatrend
