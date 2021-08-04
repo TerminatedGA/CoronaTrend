@@ -13,9 +13,8 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Dokku deploy
-      uses: vitalyliber/dokku-github-action@v6.0
+      uses: vitalyliber/dokku-github-action@v6.1
       env:
         PRIVATE_KEY: ${{ secrets.CORONAKEY }}
-        HOST: 157.230.195.60
+        HOST: dokku@157.230.195.60
         PROJECT: coronatrend
-        APP_CONFIG: ${{ secrets.APP_CONFIG }}
