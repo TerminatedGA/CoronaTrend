@@ -195,28 +195,29 @@ def multiple_output(selected_change_slider,
     else:
         mutcolumn = 'AA Label'
     if search_mut is None or search_mut == '':
-        searchmut = (pxdf1[mutcolumn] != None)
+        searchmutline = (pxdf1[mutcolumn] != None)
         searchmutpie = (piedf1[mutcolumn] != None)
     else: 
-        searchmut = (pxdf1[mutcolumn].str.contains(search_mut, case=False)) 
+        searchmutline = (pxdf1[mutcolumn].str.contains(search_mut, case=False)) 
         searchmutpie = (piedf1[mutcolumn].str.contains(search_mut, case=False)) 
     if selected_gene == "All":
-        selectedgene = (pxdf1['Gene'] != None)
+        selectedgeneline = (pxdf1['Gene'] != None)
         selectedgenepie = (piedf1['Gene'] != None)
     else:
-        selectedgene = (pxdf1['Gene'] == selected_gene)
+        selectedgeneline = (pxdf1['Gene'] == selected_gene)
         selectedgenepie = (piedf1['Gene'] == selected_gene)
-
-    filtered_pxdf1 = pxdf1[(pxdf1[changecolumn] >= selected_change_slider) & 
-                           (pxdf1['Initial prevalence'] >= selected_init[0]) & 
-                           (pxdf1['Initial prevalence'] <= selected_init[1]) &
+        
+ #Filters dataframe based on user selection       
+    def filter_df(df, selectedgene, searchmut):
+        return df[(df[changecolumn] >= selected_change_slider) & 
+                           (df['Initial prevalence'] >= selected_init[0]) & 
+                           (df['Initial prevalence'] <= selected_init[1]) &
                            selectedgene &
                            searchmut]
-    filtered_piedf1 =  piedf1[(piedf1[changecolumn] >= selected_change_slider) & 
-                           (piedf1['Initial prevalence'] >= selected_init[0]) & 
-                           (piedf1['Initial prevalence'] <= selected_init[1]) &
-                           selectedgenepie &
-                           searchmutpie]
+    
+    filtered_pxdf1 = filter_df(pxdf1, selectedgeneline, searchmutline)
+    
+    filtered_piedf1 =  filter_df(piedf1, selectedgenepie, searchmutpie)
     
     piedict = Counter(filtered_piedf1['Gene'])
         
