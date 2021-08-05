@@ -40,13 +40,15 @@ app.layout = html.Div([
                     children=[dcc.Loading(
                                 id='loading-mutation-chart',
                                 children=[dcc.Graph(id='mutation-chart', 
-                                                    style={'height': '90vh'})])]),
+                                                    style={'height': '90vh'},
+                                                    config={"displaylogo": False})])]),
             #Graph 2: Gene Pie Chart
             dcc.Tab(label='Gene Pie Chart',
                     children=[dcc.Loading(
                                 id='loading-pie-chart',
                                 children=[dcc.Graph(id='pie-chart', 
-                                        style={'height': '90vh'})])])],
+                                                    style={'height': '90vh'},
+                                                    config={"displaylogo": False})])])],
             style={'height': 60})],
             style={'width': '78vw', 'display': 'inline-block', 'vertical-align': 'top'}),
     html.Div([    
