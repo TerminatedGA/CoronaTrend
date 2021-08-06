@@ -79,6 +79,10 @@ app.layout = html.Div([
                    value='aamut',
                    style={'fontSize': 13}),
         html.Hr(style={'borderColor': '#828282'}),
+        dcc.Checklist(id='remove-syn-checkbox',
+                      options=[{'label': 'Remove Synonymous Mutations', 'value': 'drop'}],
+                      value = ['drop']),
+        html.Hr(style={'borderColor': '#828282'}),
         html.Div('Filter by gene using dropdown:', 
         style={'color': 'black', 'fontSize': 15}),
         dcc.Dropdown(
@@ -133,7 +137,8 @@ def update_output(value):
      Input('mut-input', 'value'), 
      Input('change-mut', 'value'), 
      Input('lineage-dropdown', 'value'), 
-     Input('y-scale', 'value')])
+     Input('y-scale', 'value'),
+     Input('remove-syn-checkbox', 'value')])
 def multiple_output(selected_change_slider, 
                     selected_change_radio, 
                     selected_init, 
@@ -141,7 +146,8 @@ def multiple_output(selected_change_slider,
                     search_mut, 
                     mut_radio, 
                     selected_lineage, 
-                    selected_y_scale):
+                    selected_y_scale,
+                    remove_syn):
     #Update figure with user selection
     
     
@@ -211,28 +217,37 @@ def multiple_output(selected_change_slider,
     else:
         selectedgeneline = (pxdf1['Gene'] == selected_gene)
         selectedgenepie = (piedf1['Gene'] == selected_gene)
+    if remove_syn == ['drop']:
+        removesynline = (pxdf1['Synonymous'] == 'No')
+        removesynpie = (piedf1['Synonymous'] == 'No')
+    else:
+        removesynline = (pxdf1['Synonymous'] != None)
+        removesynpie = (piedf1['Synonymous'] != None)
+        
         
  #Filters dataframe based on user selection       
-    def filter_df(df, selectedgene, searchmut):
+    def filter_df(df, selectedgene, searchmut, removesyn):
         return df[(df[changecolumn] >= selected_change_slider) & 
                            (df['Initial prevalence'] >= selected_init[0]) & 
                            (df['Initial prevalence'] <= selected_init[1]) &
                            selectedgene &
-                           searchmut]
+                           searchmut &
+                           removesyn]
     
-    filtered_pxdf1 = filter_df(pxdf1, selectedgeneline, searchmutline)
+    filtered_pxdf1 = filter_df(pxdf1, selectedgeneline, searchmutline, removesynline)
     
-    filtered_piedf1 =  filter_df(piedf1, selectedgenepie, searchmutpie)
-    
+    filtered_piedf1 =  filter_df(piedf1, selectedgenepie, searchmutpie, removesynpie)
+
+#Count the genes for each amino acid mutation
     piedict = Counter(filtered_piedf1['Gene'])
         
-    #Create new mutation suggestion list for search bar
+#Create new mutation suggestion list for search bar
     if mut_radio == 'nuclmut':
         mutsuggestlist = natsort.natsorted(set(filtered_pxdf1['Mutations']))
     else:
         mutsuggestlist = natsort.natsorted(set(filtered_pxdf1['AA Label']))
     
-    #Create mutation chart from dataframe 1
+#Create mutation chart from dataframe 1
     fig1 = px.line(filtered_pxdf1,
                 x = 'Periods',
                 y = 'Percentage by period', 
@@ -240,7 +255,7 @@ def multiple_output(selected_change_slider,
                 custom_data = [filtered_pxdf1['Labels']])
     fig1.update_traces(hovertemplate='<b>%{customdata[0]}</b><br><br>Week: %{x}<br>Prevalence: %{y}'+'%'+'<extra></extra>')
     
-    #Create chart showing sample size of sequence in each time point 
+#Create chart showing sample size of sequence in each time point 
     fig2 = px.line(pxdf2, 
                 x = 'Periods',
                 y = 'Totals',
