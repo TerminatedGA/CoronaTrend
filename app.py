@@ -22,8 +22,6 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets, update_title='CoronaTrend - Loading')
 
-app.title = "CoronaTrend"
-
 server = app.server
 
 app.index_string = index_html.read()
