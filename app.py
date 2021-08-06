@@ -11,22 +11,22 @@ from collections import Counter
 
 first = True
 
-index_html = open('assets/index.html', 'r')
-
 lineagedict = dict(zip(['All Sequences', 'B.1.1.7','B.1.1.63', 'B.1.36', 'B.1.351', 'B.1.427', 'B.1.525', 'B.1.526', 'B.1.620', 'B.1.621', 'B.1.617.1', 'B.1.617.2', 'C.37', 'P.1', 'P.2'],
                        ['All', 'B117', 'B1163', 'B136', 'B1351', 'B1427', 'B1525', 'B1526', 'B1620', 'B1621', 'B16171', 'B16172', 'C37', 'P1', 'P2']))
 
 hrstyledict = dict(zip(['borderColor', 'margin', 'marginLeft', 'width'], ['#828282', 15, '-4%', '113%']))
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+index_html = open('assets/index.html', 'r')
+
+external_stylesheets = [dbc.themes.FLATLY]
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets, update_title='CoronaTrend - Loading')
-
-server = app.server
 
 app.index_string = index_html.read()
 
 index_html.close()
+
+server = app.server
 
 app.layout = html.Div([
     html.Div('CoronaTrend', 
@@ -42,7 +42,7 @@ app.layout = html.Div([
                   children=[html.Option(value=word) for word in []]),
     html.Div(children=[dcc.Tabs([
             #Graph 1: Mutation graph
-            dcc.Tab(label='Mutation graph', 
+            dcc.Tab(label='Mutation Prevalence',
                     children=[dcc.Loading(
                                 id='loading-mutation-chart',
                                 children=[dcc.Graph(id='mutation-chart', 
@@ -86,7 +86,7 @@ app.layout = html.Div([
                    style={'fontSize': 13}),
         html.Hr(style=hrstyledict),
         dcc.Checklist(id='remove-syn-checkbox',
-                      options=[{'label': 'Remove Synonymous Mutations', 'value': 'drop'}],
+                      options=[{'label': 'Hide Synonymous Mutations', 'value': 'drop'}],
                       value = ['drop']),
         html.Hr(style=hrstyledict),
         html.Div('Filter by gene using dropdown:', 
