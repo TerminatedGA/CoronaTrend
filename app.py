@@ -11,8 +11,12 @@ from collections import Counter
 
 first = True
 
+index_html = open('assets/index.html', 'r')
+
 lineagedict = dict(zip(['All Sequences', 'B.1.1.7','B.1.1.63', 'B.1.36', 'B.1.351', 'B.1.427', 'B.1.525', 'B.1.526', 'B.1.620', 'B.1.621', 'B.1.617.1', 'B.1.617.2', 'C.37', 'P.1', 'P.2'],
                        ['All', 'B117', 'B1163', 'B136', 'B1351', 'B1427', 'B1525', 'B1526', 'B1620', 'B1621', 'B16171', 'B16172', 'C37', 'P1', 'P2']))
+
+hrstyledict = dict(zip(['borderColor', 'margin', 'marginLeft', 'width'], ['#828282', 15, '-4%', '113%']))
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -21,6 +25,10 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets, update_titl
 app.title = "CoronaTrend"
 
 server = app.server
+
+app.index_string = index_html.read()
+
+index_html.close()
 
 app.layout = html.Div([
     html.Div('CoronaTrend', 
@@ -68,7 +76,7 @@ app.layout = html.Div([
         options=[{'label': list(lineagedict.keys())[x], 'value': list(lineagedict.values())[x]} for x in range(len(lineagedict))],
         value="B136",
         clearable=False),
-        html.Hr(style={'borderColor': '#828282'}),
+        html.Hr(style=hrstyledict),
         dcc.Input(id="mut-input", 
                   type="text", 
                   placeholder="Search for mutation", 
@@ -78,11 +86,11 @@ app.layout = html.Div([
                             {'label': 'Nucleotide Mutations', 'value': 'nuclmut'}],
                    value='aamut',
                    style={'fontSize': 13}),
-        html.Hr(style={'borderColor': '#828282'}),
+        html.Hr(style=hrstyledict),
         dcc.Checklist(id='remove-syn-checkbox',
                       options=[{'label': 'Remove Synonymous Mutations', 'value': 'drop'}],
                       value = ['drop']),
-        html.Hr(style={'borderColor': '#828282'}),
+        html.Hr(style=hrstyledict),
         html.Div('Filter by gene using dropdown:', 
         style={'color': 'black', 'fontSize': 15}),
         dcc.Dropdown(
@@ -90,7 +98,7 @@ app.layout = html.Div([
             options=[{'label': x, 'value': x} for x in ["placeholder_text"]],
             value="All",
             clearable=False),
-        html.Hr(style={'borderColor': '#828282'}),
+        html.Hr(style=hrstyledict),
         html.Div(id='change-slider-container'),
         dcc.RadioItems(id='change-radio',
                        options=[{'label': '(Final - Initial)', 'value': 'fin'},
@@ -102,7 +110,7 @@ app.layout = html.Div([
                max=100,
                value=10,
                step=0.5)]),
-        html.Hr(style={'borderColor': '#828282'}),
+        html.Hr(style=hrstyledict),
         html.Div(id='init-slider-container-min'),
         html.Div(id='init-slider-container-max'),
         html.Div([dcc.RangeSlider(id='init-slider',
