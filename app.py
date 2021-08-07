@@ -42,7 +42,7 @@ app.layout = html.Div([
                   children=[html.Option(value=word) for word in []]),
     html.Div(children=[dcc.Tabs([
             #Graph 1: Mutation graph
-            dcc.Tab(label='Mutation Prevalence',
+            dcc.Tab(label='Mutation graph', 
                     children=[dcc.Loading(
                                 id='loading-mutation-chart',
                                 children=[dcc.Graph(id='mutation-chart', 
@@ -64,7 +64,8 @@ app.layout = html.Div([
                    options=[{'label': 'Linear Primary Y-axis', 'value': "linear"},
                             {'label': 'Log Primary Y-axis', 'value': "log"}],
                    value="linear",
-                   style={'fontSize': 13}),
+                   style={'fontSize': 13},
+                   labelStyle={'display': 'block'}),
         html.Div('Filters', 
         style={'color': 'black', 'fontSize': 20, 'font-weight': 'bold'}),
         html.Div('Filter by lineage using dropdown:', 
@@ -83,7 +84,8 @@ app.layout = html.Div([
                    options=[{'label': 'AA Mutations', 'value': 'aamut'},
                             {'label': 'Nucleotide Mutations', 'value': 'nuclmut'}],
                    value='aamut',
-                   style={'fontSize': 13}),
+                   style={'fontSize': 13},
+                   labelStyle={'display': 'block'}),
         html.Hr(style=hrstyledict),
         dcc.Checklist(id='remove-syn-checkbox',
                       options=[{'label': 'Hide Synonymous Mutations', 'value': 'drop'}],
