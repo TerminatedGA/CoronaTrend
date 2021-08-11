@@ -170,10 +170,10 @@ def multiple_output(selected_change_slider,
         global piedf1
         global genelistfinal
 
-        url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.parquet?raw=true'
-        url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_2.parquet?raw=true'
-        pxdf1 = pd.read_parquet(url1)
-        pxdf2 = pd.read_parquet(url2)
+        url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.feather?raw=true'
+        url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_2.feather?raw=true'
+        pxdf1 = pd.read_feather(url1)
+        pxdf2 = pd.read_feather(url2)
         
         piedf1 = pxdf1
 
@@ -186,14 +186,14 @@ def multiple_output(selected_change_slider,
         first = False
     
     else:
-        urlcheck1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.parquet?raw=true'
+        urlcheck1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.feather?raw=true'
         if urlcheck1 == url1:
             pass
         else:
-            url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.parquet?raw=true'
-            url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_2.parquet?raw=true'
-            pxdf1 = pd.read_parquet(url1)
-            pxdf2 = pd.read_parquet(url2)
+            url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.feather?raw=true'
+            url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_2.feather?raw=true'
+            pxdf1 = pd.read_feather(url1)
+            pxdf2 = pd.read_feather(url2)
             
             piedf1 = pxdf1
             
