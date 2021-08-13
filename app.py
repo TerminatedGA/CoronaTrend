@@ -107,6 +107,13 @@ app.layout = html.Div([
             value="All",
             clearable=False),
         html.Hr(style=hrstyledict),
+        html.Div('Minimum total number of sequences per time period:', 
+        style={'color': 'black', 'fontSize': 15}),
+        dcc.Input(
+            id="total-input",
+            type="number",
+            value=10),
+        html.Hr(style=hrstyledict),
         html.Div(id='change-slider-container'),
         dcc.RadioItems(id='change-radio',
                        options=[{'label': '(Final - Initial)', 'value': 'fin'},
@@ -157,7 +164,8 @@ def update_output(value):
      Input('lineage-dropdown', 'value'), 
      Input('y-scale', 'value'),
      Input('remove-syn-checkbox', 'value'),
-     Input('country-dropdown', 'value')])
+     Input('country-dropdown', 'value'),
+     Input('total-input', 'value')])
 def multiple_output(selected_change_slider, 
                     selected_change_radio, 
                     selected_init, 
@@ -167,10 +175,9 @@ def multiple_output(selected_change_slider,
                     selected_lineage, 
                     selected_y_scale,
                     remove_syn,
-                    selected_country):
+                    selected_country,
+                    input_total):
     #Update figure with user selection
-    
-    
     
     global first
     if first == True:
@@ -180,7 +187,9 @@ def multiple_output(selected_change_slider,
         global pxdf2
         global piedf1
         global genelistfinal
-        
+        global mutationlist
+        global totallist
+        global periodlist1repeats
 
         url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, selected_country)
         url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_2.feather?raw=true'.format(selected_lineage, selected_lineage, selected_country)
@@ -198,6 +207,7 @@ def multiple_output(selected_change_slider,
         pxdf1['Periods'] = list(pxdf2['Periods']) * periodlist1repeats
         mutationlist = metadata[0]
         mutationlist.insert(0, "All")
+        totallist = list(pxdf2["Totals"])
 
         first = False
     
@@ -222,6 +232,17 @@ def multiple_output(selected_change_slider,
             pxdf1['Periods'] = list(pxdf2['Periods']) * periodlist1repeats
             mutationlist = metadata[0]
             mutationlist.insert(0, "All")
+            totallist = list(pxdf2["Totals"])
+    
+    if input_total is None:
+        input_total = 0
+    
+    deletedlist = []
+    for x in range(len(totallist)):
+        if totallist[x] < input_total:
+            deletedlist.append(x)
+            
+    filtered_pxdf2 = pxdf2.drop(deletedlist)
     
     if search_mut is not None:
         search_mut = search_mut.upper()
@@ -267,6 +288,7 @@ def multiple_output(selected_change_slider,
     
     filtered_piedf1 =  filter_df(piedf1, selectedgenepie, searchmutpie, removesynpie)
 
+
 #Count the genes for each amino acid mutation
     piedict = Counter(filtered_piedf1['Gene'])
         
@@ -285,7 +307,7 @@ def multiple_output(selected_change_slider,
     fig1.update_traces(hovertemplate='<b>%{customdata[0]}</b><br><br>Week: %{x}<br>Prevalence: %{y}'+'%'+'<extra></extra>')
     
 #Create chart showing sample size of sequence in each time point 
-    fig2 = px.line(pxdf2, 
+    fig2 = px.line(filtered_pxdf2, 
                 x = 'Periods',
                 y = 'Totals',
                 color = 'Label', 
