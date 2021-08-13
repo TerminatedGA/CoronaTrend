@@ -68,12 +68,20 @@ app.layout = html.Div([
                    labelStyle={'display': 'block'}),
         html.Div('Filters', 
         style={'color': 'black', 'fontSize': 20, 'font-weight': 'bold'}),
-        html.Div('Filter by lineage using dropdown:', 
+        html.Div('Lineage:', 
         style={'color': 'black', 'fontSize': 15}),
         dcc.Dropdown(
         id='lineage-dropdown',
         options=[{'label': list(lineagedict.keys())[x], 'value': list(lineagedict.values())[x]} for x in range(len(lineagedict))],
-        value="B136",
+        value="B1351",
+        clearable=False),
+        html.Hr(style=hrstyledict),
+        html.Div('Country:', 
+        style={'color': 'black', 'fontSize': 15}),
+        dcc.Dropdown(
+        id='country-dropdown',
+        options=[{'label': "Loading...", 'value': "placeholder"}],
+        value="All",
         clearable=False),
         html.Hr(style=hrstyledict),
         dcc.Input(id="mut-input", 
@@ -91,11 +99,11 @@ app.layout = html.Div([
                       options=[{'label': 'Hide Synonymous Mutations', 'value': 'drop'}],
                       value = ['drop']),
         html.Hr(style=hrstyledict),
-        html.Div('Filter by gene using dropdown:', 
+        html.Div('Gene:', 
         style={'color': 'black', 'fontSize': 15}),
         dcc.Dropdown(
             id='gene-dropdown',
-            options=[{'label': x, 'value': x} for x in ["placeholder_text"]],
+            options=[{'label': 'Loading...', 'value':"placeholder"}],
             value="All",
             clearable=False),
         html.Hr(style=hrstyledict),
@@ -138,7 +146,8 @@ def update_output(value):
     [Output('mutation-chart', 'figure'), 
      Output('pie-chart', 'figure'), 
      Output('mut-suggestion', 'children'), 
-     Output('gene-dropdown', 'options')],
+     Output('gene-dropdown', 'options'),
+     Output('country-dropdown', 'options')],
     [Input('change-slider', 'value'), 
      Input('change-radio', 'value'), 
      Input('init-slider', 'value'), 
@@ -147,7 +156,8 @@ def update_output(value):
      Input('change-mut', 'value'), 
      Input('lineage-dropdown', 'value'), 
      Input('y-scale', 'value'),
-     Input('remove-syn-checkbox', 'value')])
+     Input('remove-syn-checkbox', 'value'),
+     Input('country-dropdown', 'value')])
 def multiple_output(selected_change_slider, 
                     selected_change_radio, 
                     selected_init, 
@@ -156,7 +166,8 @@ def multiple_output(selected_change_slider,
                     mut_radio, 
                     selected_lineage, 
                     selected_y_scale,
-                    remove_syn):
+                    remove_syn,
+                    selected_country):
     #Update figure with user selection
     
     
@@ -169,11 +180,14 @@ def multiple_output(selected_change_slider,
         global pxdf2
         global piedf1
         global genelistfinal
+        
 
-        url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.feather?raw=true'
-        url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_2.feather?raw=true'
+        url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, selected_country)
+        url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_2.feather?raw=true'.format(selected_lineage, selected_lineage, selected_country)
+        url3 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_metadata.pickle?raw=true'.format(selected_lineage, selected_lineage)
         pxdf1 = pd.read_feather(url1)
         pxdf2 = pd.read_feather(url2)
+        metadata = pd.read_pickle(url3, compression = "gzip")
         
         piedf1 = pxdf1
 
@@ -182,18 +196,22 @@ def multiple_output(selected_change_slider,
         genelistfinal.insert(0, "All")
         pxdf1 = pxdf1.explode('Percentage by period')
         pxdf1['Periods'] = list(pxdf2['Periods']) * periodlist1repeats
+        mutationlist = metadata[0]
+        mutationlist.insert(0, "All")
 
         first = False
     
     else:
-        urlcheck1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.feather?raw=true'
+        urlcheck1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, selected_country)
         if urlcheck1 == url1:
             pass
         else:
-            url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_1.feather?raw=true'
-            url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/' + selected_lineage + '_2.feather?raw=true'
+            url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, selected_country)
+            url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_2.feather?raw=true'.format(selected_lineage, selected_lineage, selected_country)
+            url3 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_metadata.pickle?raw=true'.format(selected_lineage, selected_lineage)
             pxdf1 = pd.read_feather(url1)
             pxdf2 = pd.read_feather(url2)
+            metadata = pd.read_pickle(url3, compression = "gzip")
             
             piedf1 = pxdf1
             
@@ -202,6 +220,8 @@ def multiple_output(selected_change_slider,
             genelistfinal.insert(0, "All")
             pxdf1 = pxdf1.explode('Percentage by period')
             pxdf1['Periods'] = list(pxdf2['Periods']) * periodlist1repeats
+            mutationlist = metadata[0]
+            mutationlist.insert(0, "All")
     
     if search_mut is not None:
         search_mut = search_mut.upper()
@@ -301,7 +321,7 @@ def multiple_output(selected_change_slider,
                             'xanchor': 'center'}, 
                         template = 'plotly_white')
 
-    return pxfig1, piefig1, [html.Option(value=word) for word in mutsuggestlist], [{'label': x, 'value': x} for x in genelistfinal]
+    return pxfig1, piefig1, [html.Option(value=word) for word in mutsuggestlist], [{'label': x, 'value': x} for x in genelistfinal], [{'label': x, 'value': x.replace(" ", "_")} for x in mutationlist]
 
 if __name__ == '__main__':
     app.run_server()
