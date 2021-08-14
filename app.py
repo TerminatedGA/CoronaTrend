@@ -177,65 +177,67 @@ def multiple_output(selected_change_slider,
                     remove_syn,
                     selected_country,
                     input_total):
-    #Update figure with user selection
+#Update figure with user selection
+#Defaults
+    if input_total is None:
+        input_total = 0
     
     global first
     if first == True:
         global url1
-        global url2
-        global pxdf1
-        global pxdf2
-        global piedf1
+        global pxdf1original
+        global pxdf2original
         global genelistfinal
-        global mutationlist
+        global countrylist
         global totallist
         global periodlist1repeats
 
         url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, selected_country)
         url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_2.feather?raw=true'.format(selected_lineage, selected_lineage, selected_country)
         url3 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_metadata.pickle?raw=true'.format(selected_lineage, selected_lineage)
-        pxdf1 = pd.read_feather(url1)
-        pxdf2 = pd.read_feather(url2)
+        pxdf1original = pd.read_feather(url1)
+        pxdf2original = pd.read_feather(url2)
         metadata = pd.read_pickle(url3, compression = "gzip")
         
-        piedf1 = pxdf1
+        pxdf1 = pxdf1original.copy()
+        test = pxdf1original.copy()
+        pxdf2 = pxdf2original.copy()
+        piedf1 = pxdf1.copy()
 
-        periodlist1repeats = len(pxdf1['Mutations'])
-        genelistfinal = natsort.natsorted(set(pxdf1['Gene']))
+        countrylist = metadata[0]
+        countrylist.insert(0, "All")
+        totallist = list(pxdf2original["Totals"])
+        periodlist1repeats = len(pxdf1original['Mutations'])
+        genelistfinal = natsort.natsorted(set(pxdf1original['Gene']))
         genelistfinal.insert(0, "All")
-        pxdf1 = pxdf1.explode('Percentage by period')
-        pxdf1['Periods'] = list(pxdf2['Periods']) * periodlist1repeats
-        mutationlist = metadata[0]
-        mutationlist.insert(0, "All")
-        totallist = list(pxdf2["Totals"])
 
         first = False
     
     else:
         urlcheck1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, selected_country)
         if urlcheck1 == url1:
-            pass
+            pxdf1 = pxdf1original.copy()
+            pxdf2 = pxdf2original.copy()
+            piedf1 = pxdf1.copy()
+            
         else:
             url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, selected_country)
             url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_2.feather?raw=true'.format(selected_lineage, selected_lineage, selected_country)
             url3 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_metadata.pickle?raw=true'.format(selected_lineage, selected_lineage)
-            pxdf1 = pd.read_feather(url1)
-            pxdf2 = pd.read_feather(url2)
+            pxdf1original = pd.read_feather(url1)
+            pxdf2original = pd.read_feather(url2)
             metadata = pd.read_pickle(url3, compression = "gzip")
+        
+            pxdf1 = pxdf1original.copy()
+            pxdf2 = pxdf2original.copy()
+            piedf1 = pxdf1.copy()
             
-            piedf1 = pxdf1
-            
-            periodlist1repeats = len(pxdf1['Mutations'])
-            genelistfinal = natsort.natsorted(set(pxdf1['Gene']))
+            countrylist = metadata[0]
+            countrylist.insert(0, "All")
+            totallist = list(pxdf2original["Totals"])
+            periodlist1repeats = len(pxdf1original['Mutations'])
+            genelistfinal = natsort.natsorted(set(pxdf1original['Gene']))
             genelistfinal.insert(0, "All")
-            pxdf1 = pxdf1.explode('Percentage by period')
-            pxdf1['Periods'] = list(pxdf2['Periods']) * periodlist1repeats
-            mutationlist = metadata[0]
-            mutationlist.insert(0, "All")
-            totallist = list(pxdf2["Totals"])
-    
-    if input_total is None:
-        input_total = 0
     
     deletedlist = []
     for x in range(len(totallist)):
@@ -243,6 +245,12 @@ def multiple_output(selected_change_slider,
             deletedlist.append(x)
             
     filtered_pxdf2 = pxdf2.drop(deletedlist)
+    
+    pxdf1["Percentage by period"] = [[a[b] for b in range(len(a)) if b not in deletedlist] for a in pxdf1original["Percentage by period"]]
+    
+    pxdf1 = pxdf1.explode('Percentage by period')
+    pxdf1['Periods'] = list(filtered_pxdf2['Periods']) * periodlist1repeats
+    #pxdf1['Periods'] = list(pxdf2['Periods']) * periodlist1repeats
     
     if search_mut is not None:
         search_mut = search_mut.upper()
@@ -343,7 +351,7 @@ def multiple_output(selected_change_slider,
                             'xanchor': 'center'}, 
                         template = 'plotly_white')
 
-    return pxfig1, piefig1, [html.Option(value=word) for word in mutsuggestlist], [{'label': x, 'value': x} for x in genelistfinal], [{'label': x, 'value': x.replace(" ", "_")} for x in mutationlist]
+    return pxfig1, piefig1, [html.Option(value=word) for word in mutsuggestlist], [{'label': x, 'value': x} for x in genelistfinal], [{'label': x, 'value': x.replace(" ", "_")} for x in countrylist]
 
 if __name__ == '__main__':
     app.run_server()
