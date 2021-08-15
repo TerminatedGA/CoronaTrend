@@ -29,6 +29,13 @@ index_html.close()
 server = app.server
 
 app.layout = html.Div([
+    html.Datalist(id='mut-suggestion', 
+                  children=[html.Option(value=word) for word in []]),
+    html.Datalist(id='country-suggestion', 
+                  children=[html.Option(value=word) for word in []]),
+    html.Div(id='graph-error-container',
+                 children='', 
+                 style={'color': 'red', 'fontSize': 10}),
     html.Div('CoronaTrend', 
         style={'color': 'black', 'fontSize': 25, 'font-weight': 'bold'}),
     html.Div(
@@ -38,13 +45,7 @@ app.layout = html.Div([
                              target='_blank',
                              children=[html.Img(src=app.get_asset_url('images/GISAID.png'),
                                                 style={'width': 35, 'display': 'inline-block'})])]),  
-    html.Datalist(id='mut-suggestion', 
-                  children=[html.Option(value=word) for word in []]),
-    html.Datalist(id='country-suggestion', 
-                  children=[html.Option(value=word) for word in []]),
-    html.Div(id='graph-error-container',
-                 children='', 
-                 style={'color': 'red', 'fontSize': 10}),
+    
     html.Div(children=[dcc.Tabs([
             #Graph 1: Mutation graph
             dcc.Tab(label='Mutation graph', 
@@ -52,7 +53,14 @@ app.layout = html.Div([
                                 id='loading-mutation-chart',
                                 children=[dcc.Graph(id='mutation-chart', 
                                                     style={'height': '90vh'},
-                                                    config={"displaylogo": False})])]),
+                                                    config={"displaylogo": False})]),
+                      html.Div(["NOTES:", 
+                               html.Br(), 
+                               "1. The time mentioned above refers to the collection date of each sequence.", 
+                               html.Br(), 
+                               "2. Only deletion and substitution mutations are shown. Insertion mutations cannot be shown.", 
+                               html.Br(), 
+                               "3. Sequenced regions with ambiguous bases (such as N) are treated as having no mutations."])]),
             #Graph 2: Gene Pie Chart
             dcc.Tab(label='Gene Pie Chart',
                     children=[dcc.Loading(
