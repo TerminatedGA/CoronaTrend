@@ -94,6 +94,9 @@ app.layout = html.Div([
                   type="text", 
                   placeholder="Search for mutation", 
                   list='mut-suggestion'),
+        html.Div(id='mut-error-container',
+                 children='', 
+                 style={'color': 'red', 'fontSize': 10}),
         dcc.RadioItems(id='change-mut',
                    options=[{'label': 'AA Mutations', 'value': 'aamut'},
                             {'label': 'Nucleotide Mutations', 'value': 'nuclmut'}],
@@ -162,7 +165,8 @@ def update_output(value):
      Output('gene-dropdown', 'options'),
      Output('country-suggestion', 'children'),
      Output('country-error-container', 'children'),
-     Output('graph-error-container', 'children')],
+     Output('graph-error-container', 'children'),
+     Output('mut-error-container', 'children')],
     [Input('change-slider', 'value'), 
      Input('change-radio', 'value'), 
      Input('init-slider', 'value'), 
@@ -285,7 +289,9 @@ def multiple_output(selected_change_slider,
             prevcountry1 = search_country
     
     if search_mut is not None:
+        search_mutorginal = search_mut
         search_mut = search_mut.upper()
+        
     
     if selected_change_radio == 'all':
         changecolumn = 'Change in prevalence (All)(%)'
@@ -332,11 +338,17 @@ def multiple_output(selected_change_slider,
 #Count the genes for each amino acid mutation
     piedict = Counter(filtered_piedf1['Gene'])
         
-#Create new mutation suggestion list for search bar
+    #Create new mutation suggestion list for search bar
     if mut_radio == 'nuclmut':
         mutsuggestlist = natsort.natsorted(set(filtered_pxdf1['Mutations']))
     else:
         mutsuggestlist = natsort.natsorted(set(filtered_pxdf1['AA Label']))
+    
+    #Returns error if searched mutation is invalid
+    if int(len(filtered_pxdf1)) == 0:
+        muterror = "Error: {} is not a valid option!".format(search_mutorginal)
+    else:
+        muterror = ""
     
     #Create mutation chart from dataframe 1
     fig1 = px.line(filtered_pxdf1,
@@ -389,7 +401,7 @@ def multiple_output(selected_change_slider,
     else:
         grapherrortext = ""
         
-    return pxfig1, piefig1, [html.Option(value=word) for word in mutsuggestlist], [{'label': x, 'value': x} for x in genelistfinal], [html.Option(value=word) for word in countrylist], countryerror, grapherrortext
+    return pxfig1, piefig1, [html.Option(value=word) for word in mutsuggestlist], [{'label': x, 'value': x} for x in genelistfinal], [html.Option(value=word) for word in countrylist], countryerror, grapherrortext, muterror
 
 if __name__ == '__main__':
     app.run_server()
