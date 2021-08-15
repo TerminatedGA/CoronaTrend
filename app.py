@@ -40,6 +40,11 @@ app.layout = html.Div([
                                                 style={'width': 35, 'display': 'inline-block'})])]),  
     html.Datalist(id='mut-suggestion', 
                   children=[html.Option(value=word) for word in []]),
+    html.Datalist(id='country-suggestion', 
+                  children=[html.Option(value=word) for word in []]),
+    html.Div(id='graph-error-container',
+                 children='', 
+                 style={'color': 'red', 'fontSize': 10}),
     html.Div(children=[dcc.Tabs([
             #Graph 1: Mutation graph
             dcc.Tab(label='Mutation graph', 
@@ -67,22 +72,23 @@ app.layout = html.Div([
                    style={'fontSize': 13},
                    labelStyle={'display': 'block'}),
         html.Div('Filters', 
-        style={'color': 'black', 'fontSize': 20, 'font-weight': 'bold'}),
+                 style={'color': 'black', 'fontSize': 20, 'font-weight': 'bold'}),
         html.Div('Lineage:', 
-        style={'color': 'black', 'fontSize': 15}),
-        dcc.Dropdown(
-        id='lineage-dropdown',
-        options=[{'label': list(lineagedict.keys())[x], 'value': list(lineagedict.values())[x]} for x in range(len(lineagedict))],
-        value="B1351",
-        clearable=False),
+                 style={'color': 'black', 'fontSize': 15}),
+        dcc.Dropdown(id='lineage-dropdown',
+                     options=[{'label': list(lineagedict.keys())[x], 'value': list(lineagedict.values())[x]} for x in range(len(lineagedict))],
+                     value="B1351",
+                     clearable=False),
         html.Hr(style=hrstyledict),
         html.Div('Country:', 
-        style={'color': 'black', 'fontSize': 15}),
-        dcc.Dropdown(
-        id='country-dropdown',
-        options=[{'label': "Loading...", 'value': "placeholder"}],
-        value="All",
-        clearable=False),
+                 style={'color': 'black', 'fontSize': 15}),
+        dcc.Input(id='country-input',
+                  type='text',
+                  value='',
+                  list="country-suggestion"),
+        html.Div(id='country-error-container',
+                 children='', 
+                 style={'color': 'red', 'fontSize': 10}),
         html.Hr(style=hrstyledict),
         dcc.Input(id="mut-input", 
                   type="text", 
@@ -100,7 +106,7 @@ app.layout = html.Div([
                       value = ['drop']),
         html.Hr(style=hrstyledict),
         html.Div('Gene:', 
-        style={'color': 'black', 'fontSize': 15}),
+                 style={'color': 'black', 'fontSize': 15}),
         dcc.Dropdown(
             id='gene-dropdown',
             options=[{'label': 'Loading...', 'value':"placeholder"}],
@@ -108,7 +114,7 @@ app.layout = html.Div([
             clearable=False),
         html.Hr(style=hrstyledict),
         html.Div('Minimum total number of sequences per time period:', 
-        style={'color': 'black', 'fontSize': 15}),
+                 style={'color': 'black', 'fontSize': 15}),
         dcc.Input(
             id="total-input",
             type="number",
@@ -154,7 +160,9 @@ def update_output(value):
      Output('pie-chart', 'figure'), 
      Output('mut-suggestion', 'children'), 
      Output('gene-dropdown', 'options'),
-     Output('country-dropdown', 'options')],
+     Output('country-suggestion', 'children'),
+     Output('country-error-container', 'children'),
+     Output('graph-error-container', 'children')],
     [Input('change-slider', 'value'), 
      Input('change-radio', 'value'), 
      Input('init-slider', 'value'), 
@@ -164,7 +172,7 @@ def update_output(value):
      Input('lineage-dropdown', 'value'), 
      Input('y-scale', 'value'),
      Input('remove-syn-checkbox', 'value'),
-     Input('country-dropdown', 'value'),
+     Input('country-input', 'value'),
      Input('total-input', 'value')])
 def multiple_output(selected_change_slider, 
                     selected_change_radio, 
@@ -175,37 +183,66 @@ def multiple_output(selected_change_slider,
                     selected_lineage, 
                     selected_y_scale,
                     remove_syn,
-                    selected_country,
+                    search_country,
                     input_total):
 #Update figure with user selection
-#Defaults
+    #Check if graph has error
+    grapherror = False
+    
+    #Defaults
+    if search_country == "":
+        search_country = 'All'
     if input_total is None:
         input_total = 0
-    
+
+    #Updates country search bar results
     global first
+    if first == True:
+        global prevcountry
+        global countrylist
+        global prevlineage
+        url3 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_metadata.pickle?raw=true'.format(selected_lineage, selected_lineage)
+        prevlineage = selected_lineage
+        metadata = pd.read_pickle(url3, compression = "gzip")
+        countrylist = metadata[0]
+        prevcountry = "All"
+        countryerror = ""
+    else:
+        if selected_lineage != prevlineage:
+            url3 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_metadata.pickle?raw=true'.format(selected_lineage, selected_lineage)
+            prevlineage = selected_lineage
+            metadata = pd.read_pickle(url3, compression = "gzip")
+            countrylist = metadata[0]
+        
+    if first is False:
+        if search_country not in countrylist:
+            countryerror = "Error: {} is not a valid option!".format(search_country)
+            grapherror = True
+            search_country = prevcountry
+        else:
+            countryerror = ""
+        prevcountry = search_country
+    
+    search_country.replace(" ", "_")
+    
     if first == True:
         global url1
         global pxdf1original
         global pxdf2original
         global genelistfinal
-        global countrylist
         global totallist
         global periodlist1repeats
 
-        url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, selected_country)
-        url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_2.feather?raw=true'.format(selected_lineage, selected_lineage, selected_country)
-        url3 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_metadata.pickle?raw=true'.format(selected_lineage, selected_lineage)
+        url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, search_country)
+        url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_2.feather?raw=true'.format(selected_lineage, selected_lineage, search_country)
         pxdf1original = pd.read_feather(url1)
         pxdf2original = pd.read_feather(url2)
-        metadata = pd.read_pickle(url3, compression = "gzip")
         
         pxdf1 = pxdf1original.copy()
         test = pxdf1original.copy()
         pxdf2 = pxdf2original.copy()
         piedf1 = pxdf1.copy()
 
-        countrylist = metadata[0]
-        countrylist.insert(0, "All")
         totallist = list(pxdf2original["Totals"])
         periodlist1repeats = len(pxdf1original['Mutations'])
         genelistfinal = natsort.natsorted(set(pxdf1original['Gene']))
@@ -214,26 +251,22 @@ def multiple_output(selected_change_slider,
         first = False
     
     else:
-        urlcheck1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, selected_country)
+        urlcheck1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, search_country)
         if urlcheck1 == url1:
             pxdf1 = pxdf1original.copy()
             pxdf2 = pxdf2original.copy()
             piedf1 = pxdf1.copy()
             
         else:
-            url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, selected_country)
-            url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_2.feather?raw=true'.format(selected_lineage, selected_lineage, selected_country)
-            url3 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_metadata.pickle?raw=true'.format(selected_lineage, selected_lineage)
+            url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, search_country)
+            url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_2.feather?raw=true'.format(selected_lineage, selected_lineage, search_country)
             pxdf1original = pd.read_feather(url1)
             pxdf2original = pd.read_feather(url2)
-            metadata = pd.read_pickle(url3, compression = "gzip")
         
             pxdf1 = pxdf1original.copy()
             pxdf2 = pxdf2original.copy()
             piedf1 = pxdf1.copy()
             
-            countrylist = metadata[0]
-            countrylist.insert(0, "All")
             totallist = list(pxdf2original["Totals"])
             periodlist1repeats = len(pxdf1original['Mutations'])
             genelistfinal = natsort.natsorted(set(pxdf1original['Gene']))
@@ -249,7 +282,12 @@ def multiple_output(selected_change_slider,
     pxdf1["Percentage by period"] = [[a[b] for b in range(len(a)) if b not in deletedlist] for a in pxdf1original["Percentage by period"]]
     
     pxdf1 = pxdf1.explode('Percentage by period')
-    pxdf1['Periods'] = list(filtered_pxdf2['Periods']) * periodlist1repeats
+    if len(filtered_pxdf2['Periods']) == 0:
+        pxdf1['Periods'] = None
+        pxdf1['Labels'] = ""
+        grapherror = True
+    else:
+        pxdf1['Periods'] = list(filtered_pxdf2['Periods']) * periodlist1repeats
     #pxdf1['Periods'] = list(pxdf2['Periods']) * periodlist1repeats
     
     if search_mut is not None:
@@ -351,7 +389,15 @@ def multiple_output(selected_change_slider,
                             'xanchor': 'center'}, 
                         template = 'plotly_white')
 
-    return pxfig1, piefig1, [html.Option(value=word) for word in mutsuggestlist], [{'label': x, 'value': x} for x in genelistfinal], [{'label': x, 'value': x.replace(" ", "_")} for x in countrylist]
+#Returns error to user if no sequences are available
+    if grapherror is True:
+        grapherrortext = "Graph error: No sequences available!"
+    else:
+        grapherrortext = ""
+        
+    print([html.Option(value=word) for word in mutsuggestlist])
+
+    return pxfig1, piefig1, [html.Option(value=word) for word in mutsuggestlist], [{'label': x, 'value': x} for x in genelistfinal], [html.Option(value=word) for word in countrylist], countryerror, grapherrortext
 
 if __name__ == '__main__':
     app.run_server()
