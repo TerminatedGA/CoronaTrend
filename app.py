@@ -213,9 +213,10 @@ def multiple_output(selected_change_slider,
             prevlineage = selected_lineage
             metadata = pd.read_pickle(url3, compression = "gzip")
             countrylist = metadata[0]
-        
+    
+    #Prevents graph update until a valid country is input
     if first is False:
-        if search_country not in countrylist:
+        if search_country not in countrylist and search_country != "All":
             countryerror = "Error: {} is not a valid option!".format(search_country)
             grapherror = True
             search_country = prevcountry
@@ -225,6 +226,7 @@ def multiple_output(selected_change_slider,
     
     search_country.replace(" ", "_")
     
+    #Fetch dataframes from GitHub and generate required lists
     if first == True:
         global url1
         global pxdf1original
@@ -389,13 +391,11 @@ def multiple_output(selected_change_slider,
                             'xanchor': 'center'}, 
                         template = 'plotly_white')
 
-#Returns error to user if no sequences are available
+    #Returns error to user if no sequences are available
     if grapherror is True:
         grapherrortext = "Graph error: No sequences available!"
     else:
         grapherrortext = ""
-        
-    print([html.Option(value=word) for word in mutsuggestlist])
 
     return pxfig1, piefig1, [html.Option(value=word) for word in mutsuggestlist], [{'label': x, 'value': x} for x in genelistfinal], [html.Option(value=word) for word in countrylist], countryerror, grapherrortext
 
