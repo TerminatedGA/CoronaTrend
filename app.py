@@ -246,6 +246,7 @@ def multiple_output(selected_change_slider,
         global totallist
         global periodlist1repeats         
     
+    #Fetches new dataframe upon new user selection and generates required lists
     if first == True or prevtotal1 != input_total or prevlineage1 != selected_lineage or prevcountry1 != search_country:
         url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, search_country)
         url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_2.feather?raw=true'.format(selected_lineage, selected_lineage, search_country)
@@ -337,7 +338,7 @@ def multiple_output(selected_change_slider,
     else:
         mutsuggestlist = natsort.natsorted(set(filtered_pxdf1['AA Label']))
     
-#Create mutation chart from dataframe 1
+    #Create mutation chart from dataframe 1
     fig1 = px.line(filtered_pxdf1,
                 x = 'Periods',
                 y = 'Percentage by period', 
@@ -345,7 +346,7 @@ def multiple_output(selected_change_slider,
                 custom_data = [filtered_pxdf1['Labels']])
     fig1.update_traces(hovertemplate='<b>%{customdata[0]}</b><br><br>Week: %{x}<br>Prevalence: %{y}'+'%'+'<extra></extra>')
     
-#Create chart showing sample size of sequence in each time point 
+    #Create chart showing sample size of sequence in each time point 
     fig2 = px.line(filtered_pxdf2, 
                 x = 'Periods',
                 y = 'Totals',
