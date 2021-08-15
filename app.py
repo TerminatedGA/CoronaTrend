@@ -199,13 +199,19 @@ def multiple_output(selected_change_slider,
     global first
     if first == True:
         global prevcountry
+        global prevcountry1
         global countrylist
         global prevlineage
+        global prevlineage1
+        global prevtotal1
         url3 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_metadata.pickle?raw=true'.format(selected_lineage, selected_lineage)
         prevlineage = selected_lineage
+        prevtotal1 = input_total
         metadata = pd.read_pickle(url3, compression = "gzip")
         countrylist = metadata[0]
         prevcountry = "All"
+        prevcountry1 = search_country
+        prevlineage1 = selected_lineage
         countryerror = ""
     else:
         if selected_lineage != prevlineage:
@@ -218,6 +224,8 @@ def multiple_output(selected_change_slider,
             countryerror = "Error: {} is not a valid option!".format(search_country)
             grapherror = True
             search_country = prevcountry
+            if search_country not in countrylist and search_country != "All":
+                selected_lineage = prevlineage1
         else:
             countryerror = ""
         prevcountry = search_country
@@ -229,10 +237,16 @@ def multiple_output(selected_change_slider,
         global url1
         global pxdf1original
         global pxdf2original
+        global pxdf1
+        global pxdf2
+        global piedf1
+        global filtered_pxdf2
         global genelistfinal
+        global prevtotallist
         global totallist
-        global periodlist1repeats
-
+        global periodlist1repeats         
+    
+    if first == True or prevtotal1 != input_total or prevlineage1 != selected_lineage or prevcountry1 != search_country:
         url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, search_country)
         url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_2.feather?raw=true'.format(selected_lineage, selected_lineage, search_country)
         pxdf1original = pd.read_feather(url1)
@@ -246,48 +260,28 @@ def multiple_output(selected_change_slider,
         periodlist1repeats = len(pxdf1original['Mutations'])
         genelistfinal = natsort.natsorted(set(pxdf1original['Gene']))
         genelistfinal.insert(0, "All")
+        deletedlist = []
+        for x in range(len(totallist)):
+            if totallist[x] < input_total:
+                deletedlist.append(x)
 
-        first = False
-    
-    else:
-        urlcheck1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, search_country)
-        if urlcheck1 == url1:
-            pxdf1 = pxdf1original.copy()
-            pxdf2 = pxdf2original.copy()
-            piedf1 = pxdf1.copy()
-            
+        filtered_pxdf2 = pxdf2.drop(deletedlist)
+
+        pxdf1["Percentage by period"] = [[a[b] for b in range(len(a)) if b not in deletedlist] for a in pxdf1original["Percentage by period"]]
+        pxdf1 = pxdf1.explode('Percentage by period')
+        if len(filtered_pxdf2['Periods']) == 0:
+            pxdf1['Periods'] = None
+            pxdf1['Labels'] = ""
+            grapherror = True
         else:
-            url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, search_country)
-            url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_2.feather?raw=true'.format(selected_lineage, selected_lineage, search_country)
-            pxdf1original = pd.read_feather(url1)
-            pxdf2original = pd.read_feather(url2)
+            pxdf1['Periods'] = list(filtered_pxdf2['Periods']) * periodlist1repeats
         
-            pxdf1 = pxdf1original.copy()
-            pxdf2 = pxdf2original.copy()
-            piedf1 = pxdf1.copy()
-            
-            totallist = list(pxdf2original["Totals"])
-            periodlist1repeats = len(pxdf1original['Mutations'])
-            genelistfinal = natsort.natsorted(set(pxdf1original['Gene']))
-            genelistfinal.insert(0, "All")
-    
-    deletedlist = []
-    for x in range(len(totallist)):
-        if totallist[x] < input_total:
-            deletedlist.append(x)
-            
-    filtered_pxdf2 = pxdf2.drop(deletedlist)
-    
-    pxdf1["Percentage by period"] = [[a[b] for b in range(len(a)) if b not in deletedlist] for a in pxdf1original["Percentage by period"]]
-    
-    pxdf1 = pxdf1.explode('Percentage by period')
-    if len(filtered_pxdf2['Periods']) == 0:
-        pxdf1['Periods'] = None
-        pxdf1['Labels'] = ""
-        grapherror = True
-    else:
-        pxdf1['Periods'] = list(filtered_pxdf2['Periods']) * periodlist1repeats
-    #pxdf1['Periods'] = list(pxdf2['Periods']) * periodlist1repeats
+        if first == True:
+            first = False
+        else:
+            prevtotal1 = input_total
+            prevlineage1 = selected_lineage
+            prevcountry1 = search_country
     
     if search_mut is not None:
         search_mut = search_mut.upper()
@@ -393,7 +387,7 @@ def multiple_output(selected_change_slider,
         grapherrortext = "Graph error: No sequences available!"
     else:
         grapherrortext = ""
-
+        
     return pxfig1, piefig1, [html.Option(value=word) for word in mutsuggestlist], [{'label': x, 'value': x} for x in genelistfinal], [html.Option(value=word) for word in countrylist], countryerror, grapherrortext
 
 if __name__ == '__main__':
