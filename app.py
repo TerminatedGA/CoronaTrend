@@ -213,9 +213,7 @@ def multiple_output(selected_change_slider,
             prevlineage = selected_lineage
             metadata = pd.read_pickle(url3, compression = "gzip")
             countrylist = metadata[0]
-    
-    #Prevents graph update until a valid country is input
-    if first is False:
+        #Prevents graph update until a valid country is input
         if search_country not in countrylist and search_country != "All":
             countryerror = "Error: {} is not a valid option!".format(search_country)
             grapherror = True
@@ -241,7 +239,6 @@ def multiple_output(selected_change_slider,
         pxdf2original = pd.read_feather(url2)
         
         pxdf1 = pxdf1original.copy()
-        test = pxdf1original.copy()
         pxdf2 = pxdf2original.copy()
         piedf1 = pxdf1.copy()
 
