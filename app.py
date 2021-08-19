@@ -139,7 +139,7 @@ app.layout = html.Div([
                        style={'fontSize': 13},
                        labelStyle={'display': 'block'}),
         html.Div([dcc.Slider(id='change-slider',
-               min=0,
+               min=-100,
                max=100,
                value=10,
                step=0.5)]),
@@ -157,7 +157,7 @@ app.layout = html.Div([
     Output('change-slider-container', 'children'),
     [Input('change-slider', 'value')])
 def update_output(value):
-    return 'Minimum change in prevalence: {}%'.format(value)
+    return 'Minimum increaase in prevalence: {}%'.format(value)
 
 @app.callback(
     [Output('init-slider-container-min', 'children'), 
