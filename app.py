@@ -256,7 +256,10 @@ def multiple_output(selected_change_slider,
         global genelistfinal
         global prevtotallist
         global totallist
-        global periodlist1repeats         
+        global periodlist1repeats
+        global search_mutoriginal
+        
+        search_mutoriginal = None
     
     #Fetches new dataframe upon new user selection and generates required lists
     if first == True or prevtotal1 != input_total or prevlineage1 != selected_lineage or prevcountry1 != search_country:
@@ -297,7 +300,7 @@ def multiple_output(selected_change_slider,
             prevcountry1 = search_country
     
     if search_mut is not None:
-        search_mutorginal = search_mut
+        search_mutoriginal = search_mut
         search_mut = search_mut.upper()
         
     
@@ -342,7 +345,6 @@ def multiple_output(selected_change_slider,
     
     filtered_piedf1 =  filter_df(piedf1, selectedgenepie, searchmutpie, removesynpie)
 
-
 #Count the genes for each amino acid mutation
     piedict = Counter(filtered_piedf1['Gene'])
         
@@ -353,10 +355,12 @@ def multiple_output(selected_change_slider,
         mutsuggestlist = natsort.natsorted(set(filtered_pxdf1['AA Label']))
     
     #Returns error if searched mutation is invalid
-    if int(len(filtered_pxdf1)) == 0:
-        muterror = "Error: {} is not a valid option!".format(search_mutorginal)
+    if int(len(filtered_pxdf1)) == 0 and search_mutoriginal is not None:
+        muterror = "Error: {} is not a valid option!".format(search_mutoriginal)
     else:
         muterror = ""
+        
+    print(filtered_pxdf1)
     
     #Create mutation chart from dataframe 1
     fig1 = px.line(filtered_pxdf1,
