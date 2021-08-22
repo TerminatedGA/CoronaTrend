@@ -1,4 +1,4 @@
- ![CoronaTrend Logo]("/assets/images/CoronaTrend Logo.png")
+ ![CoronaTrend Logo](/assets/images/CoronaTrend Logo.png)
 # CoronaTrend
 
 CoronaTrend visualizes data from dataframes generated using GISAID sequences to show up-to-date mutation informtion in different lineages
@@ -17,7 +17,7 @@ Weeks with a total sequence count less than 10 are removed to maintain accuracy 
 Known bugs:
 1. Setting 'Increase in Prevalence' to a negative value may cause the graph to fail to load.
 2. Showing all data from all sequences takes a long time to load.
-3. The 'Minimum Increase in Prevalence' parameter only takes account of cases with all dates included. 
+3. The 'Minimum Increase in Prevalence' parameter only takes account of cases with all dates included.
    Dates filtered with the 'Minimum total number of sequences per time period' are not taken into account.
    
 Acknowledgements:
