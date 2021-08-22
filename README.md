@@ -1,4 +1,4 @@
-<img src="assets/images/CoronaTrend Logo.png" width="175" height="175">
+[<img src="assets/images/CoronaTrend Logo.png" width="175" height="175">](coronatrend.live)
 
 # CoronaTrend
 
