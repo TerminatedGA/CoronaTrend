@@ -1,10 +1,10 @@
-[<img src="assets/images/CoronaTrend Logo.png" width="175" height="175">](coronatrend.live)
+[<img src="assets/images/CoronaTrend Logo.png" width="175" height="175">](https://coronatrend.live)
 
 # CoronaTrend
 
 CoronaTrend visualizes data from dataframes generated using GISAID sequences to show up-to-date mutation informtion in different lineages
 
-The website is live at [coronatrend.live](coronatrend.live)
+The website is live at [coronatrend.live](https://coronatrend.live)
 
 Dataframes are generated using _dataframegen.py_.
 
