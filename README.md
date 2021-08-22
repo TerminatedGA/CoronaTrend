@@ -1,4 +1,5 @@
-<img src="assets/images/CoronaTrend Logo.png" width="250" height="250">
+<img src="assets/images/CoronaTrend Logo.png" width="100" height="100">
+
 # CoronaTrend
 
 CoronaTrend visualizes data from dataframes generated using GISAID sequences to show up-to-date mutation informtion in different lineages
