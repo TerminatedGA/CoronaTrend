@@ -36,7 +36,7 @@ app.layout = html.Div([
     html.Div([html.Div(id='graph-error-container',
                  children='', 
                  style={'color': 'red', 'fontSize': 10}),
-    html.Div(children=[html.A(href="https:/coronatrend.live",
+    html.Div(children=[html.A(href="https://coronatrend.live/",
                              children=html.Img(src=app.get_asset_url('images/CoronaTrend Logo.png'), 
                        style={'height': 100, 'width': 100}),
                               style={'display': 'inline'}),
