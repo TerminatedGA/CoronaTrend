@@ -24,7 +24,7 @@ Known bugs:
 Acknowledgements:
 The author thanks Jonathan Daniel Ip for his Python script for translating nucleotide mutations into amino acid mutations.
    
-Author: Chan Tze To
+Author: Chan Tze To\
 Email: tzetochan@connect.hku.hk
 
 
