@@ -153,7 +153,7 @@ app.layout = html.Div([
                    max=100,
                    value=[0, 100],
                    step=0.5)])], 
-        style={'width': '18vw', 'height': '90vh', 'display': 'inline-block', 'vertical-align': 'top', 'borderLeftStyle': 'solid', 'padding-left': 10, 'borderColor': '#828282', "overflow": "scroll"})])
+        style={'width': '20vw', 'height': '90vh', 'display': 'inline-block', 'vertical-align': 'top', 'borderLeftStyle': 'solid', 'padding-left': 10, 'borderColor': '#828282', "overflow": "scroll"})])
 @app.callback(
     Output('change-slider-container', 'children'),
     [Input('change-slider', 'value')])
