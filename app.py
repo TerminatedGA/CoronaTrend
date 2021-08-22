@@ -36,11 +36,13 @@ app.layout = html.Div([
     html.Div(id='graph-error-container',
                  children='', 
                  style={'color': 'red', 'fontSize': 10}),
-    html.Div('CoronaTrend', 
-        style={'color': 'black', 'fontSize': 25, 'font-weight': 'bold'}),
-    html.Div(
-            children=[html.Div('Enabled by data from', 
-                               style={'color': 'black', 'fontSize': 14, 'display': 'inline-block', 'marginRight': 5}),
+    html.Div(children=[html.Img(src=app.get_asset_url('images/CoronaTrend Logo.png'), 
+                       style={'height': 100, 'width': 100, 'display':'inline'}),
+                       html.Div('CoronaTrend',
+                       style={'color': 'black', 'fontSize': 26, 'display':'inline', 'font-weight': 'bold'})],
+             style={'display':'inline-block'}),
+    html.Div(children=[html.Div('Enabled by data from', 
+                                style={'color': 'black', 'fontSize': 14, 'display': 'inline-block', 'marginRight': 5}),
                       html.A(href="https://www.gisaid.org/",
                              target='_blank',
                              children=[html.Img(src=app.get_asset_url('images/GISAID.png'),
@@ -359,8 +361,6 @@ def multiple_output(selected_change_slider,
         muterror = "Error: {} is not a valid option!".format(search_mutoriginal)
     else:
         muterror = ""
-        
-    print(filtered_pxdf1)
     
     #Create mutation chart from dataframe 1
     fig1 = px.line(filtered_pxdf1,
