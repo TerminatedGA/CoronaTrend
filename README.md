@@ -1,4 +1,4 @@
- ![CoronaTrend Logo](assets/images/CoronaTrend Logo.png)
+![CoronaTrend Logo](assets/images/CoronaTrend&#x20;Logo.png)
 # CoronaTrend
 
 CoronaTrend visualizes data from dataframes generated using GISAID sequences to show up-to-date mutation informtion in different lineages
