@@ -14,7 +14,7 @@ first = True
 lineagedict = dict(zip(['All Sequences', 'B.1.1.7','B.1.1.63', 'B.1.36', 'B.1.351', 'B.1.427', 'B.1.525', 'B.1.526', 'B.1.620', 'B.1.621', 'B.1.617.1', 'B.1.617.2', 'C.37', 'P.1', 'P.2'],
                        ['All', 'B117', 'B1163', 'B136', 'B1351', 'B1427', 'B1525', 'B1526', 'B1620', 'B1621', 'B16171', 'B16172', 'C37', 'P1', 'P2']))
 
-hrstyledict = dict(zip(['borderColor', 'margin', 'marginLeft', 'width'], ['#828282', 15, '-4%', '113%']))
+hrstyledict = dict(zip(['borderColor', 'margin', 'marginLeft', 'width'], ['#828282', 15, '-4%', '104%']))
 
 index_html = open('assets/index.html', 'r')
 
@@ -33,7 +33,7 @@ app.layout = html.Div([
                   children=[html.Option(value=word) for word in []]),
     html.Datalist(id='country-suggestion', 
                   children=[html.Option(value=word) for word in []]),
-    html.Div(id='graph-error-container',
+    html.Div([html.Div(id='graph-error-container',
                  children='', 
                  style={'color': 'red', 'fontSize': 10}),
     html.Div(children=[html.Img(src=app.get_asset_url('images/CoronaTrend Logo.png'), 
@@ -46,7 +46,7 @@ app.layout = html.Div([
                       html.A(href="https://www.gisaid.org/",
                              target='_blank',
                              children=[html.Img(src=app.get_asset_url('images/GISAID.png'),
-                                                style={'width': 35, 'display': 'inline-block'})])]),  
+                                                style={'width': 35, 'display': 'inline-block'})])])]),  
     
     html.Div(children=[dcc.Tabs([
             #Graph 1: Mutation graph
@@ -153,8 +153,7 @@ app.layout = html.Div([
                    max=100,
                    value=[0, 100],
                    step=0.5)])], 
-        style={'width': '18vw', 'display': 'inline-block', 'vertical-align': 'top', 'borderLeftStyle': 'solid', 'padding-left': 10, 'borderColor': '#828282'})])
-
+        style={'width': '18vw', 'height': '90vh', 'display': 'inline-block', 'vertical-align': 'top', 'borderLeftStyle': 'solid', 'padding-left': 10, 'borderColor': '#828282', "overflow": "scroll"})])
 @app.callback(
     Output('change-slider-container', 'children'),
     [Input('change-slider', 'value')])
