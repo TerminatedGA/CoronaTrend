@@ -36,7 +36,7 @@ app.layout = html.Div([
     html.Div([html.Div(id='graph-error-container',
                  children='', 
                  style={'color': 'red', 'fontSize': 10}),
-    html.Div(children=[html.A(href="https://coronatrend.live/",
+    html.Div(children=[html.A(href="https://coronatrend.live",
                              children=html.Img(src=app.get_asset_url('images/CoronaTrend Logo.png'), 
                        style={'height': 100, 'width': 100}),
                               style={'display': 'inline'}),
@@ -154,8 +154,73 @@ app.layout = html.Div([
                    min=0,
                    max=100,
                    value=[0, 100],
-                   step=0.5)])], 
-        style={'width': '20vw', 'height': '95vh', 'display': 'inline-block', 'vertical-align': 'top', 'borderLeftStyle': 'solid', 'padding-left': 10, 'borderColor': '#828282', "overflow": "scroll"})])
+                   step=0.5)])],
+        style={'width': '20vw', 
+               'height': '95vh', 
+               'display': 'inline-block', 
+               'vertical-align': 'top', 
+               'borderLeftStyle': 'solid', 
+               'padding-left': 10, 
+               'borderColor': '#828282', 
+               "overflow": "scroll"}),
+html.Footer(children=[html.Div(children=[""],
+                               style={"padding": "30px"}),
+                      html.Div(children=[
+                          html.Button("Acknowledgements",
+                                      id="acknowledgement-open-button",
+                                      style={'display': 'inline-block', 'border': 'None', 'outline': 'None'},
+                                      n_clicks=0),
+                          html.Div("",
+                                   style={'display': 'inline-block', 'paddingRight': '50px'}),
+                          html.Div(children=["GISAID data provided on this website are subject to GISAID’s ", 
+                                             dcc.Link("Terms and Conditions",
+                                                      href="https://www.gisaid.org/registration/terms-of-use/")],
+                                   style={'display': 'inline-block'})],
+                               style={"borderTop": "1px grey solid", 
+                                      "paddingTop": "10px", 
+                                      "textAlign": "center",
+                                      "paddingTop": "20px", 
+                                      "paddingBottom": "30px",
+                                      "fontSize": 13})]),
+ #Acknowledgement modal window
+ html.Div([
+    html.Div([
+        html.Div([
+            html.Div([html.Div('CoronaTrend',
+                     style={'color': 'black', 'fontSize': 26, 'display':'inline', 'font-weight': 'bold'}),
+                     html.Button('✕', 
+                                id='acknowledgement-close-button',
+                                style={'float': 'right', 'border': 'None', 'outline': 'None'})],
+                     style={'paddingBottom': 20}),
+            html.Div("CoronaTrend aims to be a public resource from the The University of Hong Kong, detailing the prevalence of different mutations across different lineages as time passes. It is a project coordinated by Chan Tze To under the leadership of Prof. Kelvin To Kai Wang, along with assistance from Jonathan Daniel Ip.",
+                     style={'paddingBottom': 30}),
+            html.Div(children='GISAID Initiative',
+                     style={'color': 'black', 'fontSize': 26, 'font-weight': 'bold', 'paddingBottom': 20}),
+            html.Div("We gratefully acknowledge all data contributors, i.e. the Authors and their Originating laboratories responsible for obtaining the specimens, and their Submitting laboratories for generating the genetic sequence and metadata and sharing via the GISAID Initiative, on which this research is based.",
+                     style={'paddingBottom': 30}),
+            html.Div([html.Div("1 Elbe, S., and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID’s innovative contribution to global health. Global Challenges, 1:33-46. DOI: ",
+                               style={'display': 'inline'}),
+                      dcc.Link("10.1002/gch2.1018",
+                                href="https://dx.doi.org/10.1002/gch2.1018",
+                                style={'display': 'inline'}),
+                      html.Div(" PMCID: ",
+                               style={'display': 'inline'}),
+                      dcc.Link("31565258",
+                                href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6607375/")])])],
+        className='modal-content')],
+            id='modal',
+            className='modal',
+            style={"display": "none"})])
+
+@app.callback(Output('modal', 'style'),
+              [Input('acknowledgement-open-button', 'n_clicks'),
+               Input('acknowledgement-close-button', 'n_clicks')])
+def close_modal(selected_open, selected_close):
+    changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
+    if 'acknowledgement-open-button' in changed_id:
+        return {"display": "block"}
+    if 'acknowledgement-close-button' in changed_id:
+        return {"display": "none"}
 
 @app.callback(
     Output('change-slider-container', 'children'),
