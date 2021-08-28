@@ -10,9 +10,9 @@ Dataframes are generated using _dataframegen.py_ found in [github.com/Terminated
 
 ## Notes ##
 
-1.Sequences where a position has an ambiguous base (e.g. N) are treated as no mutations.
+1. Sequences where a position has an ambiguous base (e.g. N) are treated as no mutations.
 
-2.Weeks with a total sequence count less than 10 are removed to maintain accuracy of the mutation prevalence.
+2. Weeks with a total sequence count less than 10 are removed to maintain accuracy of the mutation prevalence.
 
 ## Known bugs ##
 
