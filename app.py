@@ -48,7 +48,8 @@ app.layout = html.Div([
                                         target='_blank',
                                         children=[html.Img(src=app.get_asset_url('images/GISAID.png'),
                                                            style={'width': 70, 'verticalAlign': 'center'})])])],
-                                 style={'display': 'inline-block', 'verticalAlign': 'bottom'})]),
+                                 style={'display': 'inline-block', 'verticalAlign': 'bottom'})],
+             style={'borderBottom': '1px solid grey'}),
     
     html.Div(children=[dcc.Tabs([
             #Graph 1: Mutation graph
@@ -174,6 +175,7 @@ html.Footer(children=[html.Div(children=[""],
                                    style={'display': 'inline-block', 'paddingRight': '50px'}),
                           html.Div(children=["GISAID data provided on this website are subject to GISAID’s ", 
                                              dcc.Link("Terms and Conditions",
+                                                      target='_blank',
                                                       href="https://www.gisaid.org/registration/terms-of-use/")],
                                    style={'display': 'inline-block'})],
                                style={"borderTop": "1px grey solid", 
@@ -201,18 +203,20 @@ html.Footer(children=[html.Div(children=[""],
             html.Div([html.Div("1) Elbe, S., and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID’s innovative contribution to global health. Global Challenges, 1:33-46. DOI: ",
                                style={'display': 'inline'}),
                       dcc.Link("10.1002/gch2.1018",
+                                target='_blank',
                                 href="https://dx.doi.org/10.1002/gch2.1018",
                                 style={'display': 'inline'}),
                       html.Div(" PMCID: ",
                                style={'display': 'inline'}),
                       dcc.Link("31565258",
+                                target='_blank',
                                 href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6607375/")])])],
         className='modal-content')],
-            id='modal',
+            id='acknowledgement-modal',
             className='modal',
             style={"display": "none"})])
 
-@app.callback(Output('modal', 'style'),
+@app.callback(Output('acknowledgement-modal', 'style'),
               [Input('acknowledgement-open-button', 'n_clicks'),
                Input('acknowledgement-close-button', 'n_clicks')])
 def close_modal(selected_open, selected_close):
@@ -467,7 +471,8 @@ def multiple_output(selected_change_slider,
                     names=piedict.keys(),
                     values=piedict.values())
     
-    piefig1.update_traces(hovertemplate='<b>Gene: %{label}</b><br>Percentage: %{percent}<br>Count: %{value}')
+    piefig1.update_traces(hovertemplate='<b>Gene: %{label}</b><br>Percentage: %{percent}<br>Count: %{value}',
+                          textfont_size=20)
     piefig1.layout.update(title={
                             'text' : 'Mutations Grouped by Genes',
                             'x':0.5,
