@@ -192,7 +192,7 @@ html.Footer(children=[html.Div(children=[""],
                                 id='acknowledgement-close-button',
                                 style={'float': 'right', 'border': 'None', 'outline': 'None'})],
                      style={'paddingBottom': 20}),
-            html.Div("CoronaTrend aims to be a public resource from the The University of Hong Kong, detailing the prevalence of different mutations across different lineages as time passes. It is a project coordinated by Chan Tze To under the leadership of Prof. Kelvin To Kai Wang, along with assistance from Jonathan Daniel Ip.",
+            html.Div("CoronaTrend aims to be a public resource from the The University of Hong Kong, detailing the prevalence of different mutations across different lineages as time passes. It is a project coordinated by Chan Tze To under the supervision of Dr. Kelvin To, along with assistance from Mr. Jonathan Ip.",
                      style={'paddingBottom': 30}),
             html.Div(children='GISAID Initiative',
                      style={'color': 'black', 'fontSize': 26, 'font-weight': 'bold', 'paddingBottom': 20}),
@@ -416,7 +416,7 @@ def multiple_output(selected_change_slider,
 
 #Count the genes for each amino acid mutation
     piedict = Counter(filtered_piedf1['Gene'])
-        
+
     #Create new mutation suggestion list for search bar
     if mut_radio == 'nuclmut':
         mutsuggestlist = natsort.natsorted(set(filtered_pxdf1['Mutations']))
