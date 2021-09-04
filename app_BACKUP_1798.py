@@ -64,13 +64,21 @@ SIDEBAR_STYLE = {
     "float": "right",
     "left": "80%",
     "width": "20%",
+<<<<<<< HEAD
+    "height": "110vh",
+=======
     "height": 700,
+>>>>>>> 40e864d942888ff9e48dac128d20e71e4f97d7f2
     "z-index": 1,
     "transition": "all 0.5s",
     "padding": "1rem 1rem",
     "background-color": "light",
     "overflow": "scroll",
+<<<<<<< HEAD
     'borderLeftStyle': 'solid',
+=======
+    'borderLeftStyle': 'solid', 
+>>>>>>> 40e864d942888ff9e48dac128d20e71e4f97d7f2
     'borderColor': '#828282'
 }
 

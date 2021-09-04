@@ -64,7 +64,7 @@ SIDEBAR_STYLE = {
     "float": "right",
     "left": "80%",
     "width": "20%",
-    "height": 700,
+    "height": "110vh",
     "z-index": 1,
     "transition": "all 0.5s",
     "padding": "1rem 1rem",

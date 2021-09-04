@@ -70,7 +70,7 @@ SIDEBAR_STYLE = {
     "padding": "1rem 1rem",
     "background-color": "light",
     "overflow": "scroll",
-    'borderLeftStyle': 'solid',
+    'borderLeftStyle': 'solid', 
     'borderColor': '#828282'
 }
 
