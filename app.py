@@ -18,7 +18,7 @@ hrstyledict = dict(zip(['borderColor', 'margin', 'marginLeft', 'width'], ['#8282
 
 index_html = open('assets/index.html', 'r')
 
-external_stylesheets = [dbc.themes.FLATLY]
+external_stylesheets = [dbc.themes.FLATLY, dbc.themes.BOOTSTRAP]
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets, update_title='CoronaTrend - Loading')
 
@@ -28,19 +28,15 @@ index_html.close()
 
 server = app.server
 
-app.layout = html.Div([
-    html.Datalist(id='mut-suggestion', 
-                  children=[html.Option(value=word) for word in []]),
-    html.Datalist(id='country-suggestion', 
-                  children=[html.Option(value=word) for word in []]),
-    html.Div([html.Div(id='graph-error-container',
-                 children='', 
-                 style={'color': 'red', 'fontSize': 10})]),
-    html.Div(children=[html.A(href="https://coronatrend.live",
-                             children=html.Img(src=app.get_asset_url('images/CoronaTrend Logo.png'), 
-                       style={'height': 100, 'width': 100}),
-                              style={'display': 'inline-block'}),
-                       html.Div([html.Div('CoronaTrend',
+navbar = dbc.Navbar(
+    id='navbar',
+    children=[
+        html.A(
+            # Use row and col to control vertical alignment of logo / brand
+            dbc.Row(
+                [
+                    dbc.Col(html.Img(src=app.get_asset_url('images/CoronaTrend Logo.png'), height="100px", width = 100)),
+                    dbc.Col([html.Div('CoronaTrend',
                                           style={'color': 'black', 'fontSize': 27, 'font-weight': 'bold'}),
                                  html.Div(children=[html.Div('Enabled by data from', 
                                                               style={'color': 'black', 'fontSize': 14, 'marginRight': 5, 'display': 'inline'}),
@@ -48,10 +44,70 @@ app.layout = html.Div([
                                         target='_blank',
                                         children=[html.Img(src=app.get_asset_url('images/GISAID.png'),
                                                            style={'width': 70, 'verticalAlign': 'center'})])])],
-                                 style={'display': 'inline-block', 'verticalAlign': 'bottom'})],
-             style={'borderBottom': '1px solid grey'}),
-    
-    html.Div(children=[dcc.Tabs([
+                           width=150),
+                ],
+                align="center",
+                no_gutters=True,
+            ),
+            href="https://coronatrend.live",
+        ),
+        dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
+        html.Span(dbc.Button("Toggle Sidebar", outline=True, color="secondary", id="btn_sidebar", style={'float': 'right'}), className="ml-auto")
+    ],
+    color="#F5F7C3",
+    dark=False,
+    style={'height': 100}
+)
+
+# the style arguments for the sidebar. We use position:fixed and a fixed width
+SIDEBAR_STYLE = {
+    "float": "right",
+    "left": "80%",
+    "width": "20%",
+    "height": 700,
+    "z-index": 1,
+    "transition": "all 0.5s",
+    "padding": "1rem 1rem",
+    "background-color": "light",
+    "overflow": "scroll",
+    'borderLeftStyle': 'solid', 
+    'borderColor': '#828282'
+}
+
+SIDEBAR_HIDDEN = {
+    "float": "right",
+    "left": "100%",
+    "width": "0%",
+    "height": 0,
+    "z-index": 1,
+    "transition": "all 0.5s",
+    "padding": "1rem 1rem",
+    "background-color": "light",
+    "overflow": "scroll",
+}
+
+# the styles for the main content position it to the right of the sidebar and
+# add some padding.
+CONTENT_STYLE = {
+    "float": "left",
+    "transition": "all 0.5s",
+    "width": "80%",
+    "height": "100%",
+    "padding": "1rem 1rem",
+    "background-color": "light",
+}
+
+CONTENT_STYLE1 = {
+    "float": "left",
+    "transition": "all 0.5s",
+    "width": "100%",
+    "height": "100%",
+    "padding": "1rem 1rem",
+    "background-color": "light",
+}
+
+content=html.Div(id='page-content',
+                 children=[dcc.Tabs([
             #Graph 1: Mutation graph
             dcc.Tab(label='Mutation graph', 
                     children=[dcc.Loading(
@@ -74,8 +130,10 @@ app.layout = html.Div([
                                                     style={'height': '90vh'},
                                                     config={"displaylogo": False})])])],
             style={'height': 60})],
-            style={'width': '78vw', 'display': 'inline-block', 'vertical-align': 'top'}),
-    html.Div([    
+            style={'width': '78vw', 'display': 'inline-block', 'vertical-align': 'top'})
+
+sidebar = html.Div(id='filter-sidebar',
+             children=[    
         html.Div('Viewing Options', 
         style={'color': 'black', 'fontSize': 20, 'font-weight': 'bold'}),
         dcc.RadioItems(id='y-scale',
@@ -155,82 +213,90 @@ app.layout = html.Div([
                    min=0,
                    max=100,
                    value=[0, 100],
-                   step=0.5)])],
-        style={'width': '20vw', 
-               'height': '95vh', 
-               'display': 'inline-block', 
-               'vertical-align': 'top', 
-               'borderLeftStyle': 'solid', 
-               'padding-left': 10, 
-               'borderColor': '#828282', 
-               "overflow": "scroll"}),
-html.Footer(children=[html.Div(children=[""],
-                               style={"padding": "30px"}),
-                      html.Div(children=[
+                   step=0.5)])])
+
+footer = html.Div(id='footer',
+                  children=[dbc.Navbar(children=[html.Div(children=[
                           html.Button("Acknowledgements",
                                       id="acknowledgement-open-button",
                                       style={'display': 'inline-block', 
                                              'border': 'None', 
                                              'outline': 'None',
-                                             'background': 'None'},
+                                             'background': 'None',
+                                             'paddingRight': '50px'},
                                       n_clicks=0),
-                          html.Div("",
-                                   style={'display': 'inline-block', 'paddingRight': '50px'}),
                           html.Div(children=["GISAID data provided on this website are subject to GISAID’s ", 
                                              dcc.Link("Terms and Conditions",
                                                       target='_blank',
                                                       href="https://www.gisaid.org/registration/terms-of-use/")],
                                    style={'display': 'inline-block'})],
+                               style={"fontSize": 13,
+                                      "textAlign": "center"})],
                                style={"borderTop": "1px grey solid", 
-                                      "paddingTop": "10px", 
                                       "textAlign": "center",
                                       "paddingTop": "20px", 
-                                      "paddingBottom": "30px",
-                                      "fontSize": 13})]),
+                                      "paddingBottom": "20px",
+                                      "width": "98vw",
+                                      'display': 'flex',
+                                      'justify-content': 'center'}),
  #Acknowledgement modal window
- html.Div([
+html.Div([
     html.Div([
-        html.Div([
-            html.Div([html.Div('CoronaTrend',
-                     style={'color': 'black', 
-                            'fontSize': 26, 
-                            'display':'inline', 
-                            'font-weight': 'bold'}),
-                     html.Button('✕', 
-                                id='acknowledgement-close-button',
-                                style={'float': 'right', 
-                                       'border': 'None', 
-                                       'outline': 'None',
-                                       'background': 'None'})],
-                     style={'paddingBottom': 20}),
-            html.Div(children=["CoronaTrend aims to be a public resource from the The University of Hong Kong, detailing the prevalence of different mutations across different lineages as time passes. ", 
-                               html.Br(),
-                               html.Br(),
-                               "Developers: Mr. Chan Tze To, Mr. Jonathan Ip, Dr. Kelvin To"],
-                     style={'paddingBottom': 30}),
-            html.Div(children='GISAID Initiative',
-                     style={'color': 'black', 
-                            'fontSize': 26, 
-                            'font-weight': 'bold', 
-                            'paddingBottom': 20}),
-            html.Div(children=["We gratefully acknowledge all data contributors, i.e. the Authors and their Originating laboratories responsible for obtaining the specimens, and their Submitting laboratories for generating the genetic sequence and metadata and sharing via the GISAID Initiative (1), on which this research is based.",
-                               html.Br(),
-                               html.Br(),
-                               html.Div([html.Div("1) Elbe, S., and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID’s innovative contribution to global health. Global Challenges, 1:33-46. DOI: ",
-                                                   style={'display': 'inline'}),
-                                          dcc.Link("10.1002/gch2.1018",
-                                                    target='_blank',
-                                                    href="https://dx.doi.org/10.1002/gch2.1018",
-                                                    style={'display': 'inline'}),
-                                          html.Div(" PMCID: ",
-                                                   style={'display': 'inline'}),
-                                          dcc.Link("31565258",
-                                                    target='_blank',
-                                                    href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6607375/")])])])],
+        html.Div([html.Div('CoronaTrend',
+                 style={'color': 'black', 
+                        'fontSize': 26, 
+                        'display':'inline', 
+                        'font-weight': 'bold'}),
+                 html.Button('✕', 
+                            id='acknowledgement-close-button',
+                            style={'float': 'right', 
+                                   'border': 'None', 
+                                   'outline': 'None',
+                                   'background': 'None'})],
+                 style={'paddingBottom': 20}),
+        html.Div(children=["CoronaTrend aims to be a public resource from the The University of Hong Kong, detailing the prevalence of different mutations across different lineages as time passes. ", 
+                           html.Br(),
+                           html.Br(),
+                           "Developers: Mr. Chan Tze To, Mr. Jonathan Ip, Dr. Kelvin To"],
+                 style={'paddingBottom': 30}),
+        html.Div(children='GISAID Initiative',
+                 style={'color': 'black', 
+                        'fontSize': 26, 
+                        'font-weight': 'bold', 
+                        'paddingBottom': 20}),
+        html.Div(children=["We gratefully acknowledge all data contributors, i.e. the Authors and their Originating laboratories responsible for obtaining the specimens, and their Submitting laboratories for generating the genetic sequence and metadata and sharing via the GISAID Initiative (1), on which this research is based.",
+                           html.Br(),
+                           html.Br(),
+                           html.Div([html.Div("1) Elbe, S., and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID’s innovative contribution to global health. Global Challenges, 1:33-46. DOI: ",
+                                               style={'display': 'inline'}),
+                                      dcc.Link("10.1002/gch2.1018",
+                                                target='_blank',
+                                                href="https://dx.doi.org/10.1002/gch2.1018",
+                                                style={'display': 'inline'}),
+                                      html.Div(" PMCID: ",
+                                               style={'display': 'inline'}),
+                                      dcc.Link("31565258",
+                                                target='_blank',
+                                                href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6607375/")])])],
         className='modal-content')],
-            id='acknowledgement-modal',
-            className='modal',
-            style={"display": "none"})])
+                id='acknowledgement-modal',
+     className='modal',
+     style={"display": "none"})])
+
+app.layout = html.Div([
+    html.Datalist(id='mut-suggestion', 
+                  children=[html.Option(value=word) for word in []]),
+    html.Datalist(id='country-suggestion', 
+                  children=[html.Option(value=word) for word in []]),
+    html.Div([html.Div(id='graph-error-container',
+                 children='', 
+                 style={'color': 'red', 'fontSize': 10})]),
+    dcc.Store(id='side_click'),
+    dcc.Location(id="url"),       
+    navbar,
+    html.Div(children=[content, sidebar],
+             style={'width': '98vw'}),
+    footer])
 
 @app.callback(Output('acknowledgement-modal', 'style'),
               [Input('acknowledgement-open-button', 'n_clicks'),
@@ -241,6 +307,39 @@ def close_modal(selected_open, selected_close):
         return {"display": "block"}
     if 'acknowledgement-close-button' in changed_id:
         return {"display": "none"}
+
+@app.callback(
+    [
+        Output("filter-sidebar", "style"),
+        Output("page-content", "style"),
+        Output("side_click", "data"),
+    ],
+
+    [Input("btn_sidebar", "n_clicks")],
+    [
+        State("side_click", "data"),
+    ]
+)
+def toggle_sidebar(n, nclick):
+    if n:
+        if nclick == "SHOW":
+            sidebar_style = SIDEBAR_HIDDEN
+            content_style = CONTENT_STYLE1
+            cur_nclick = "HIDDEN"
+        else:
+            sidebar_style = SIDEBAR_STYLE
+            content_style = CONTENT_STYLE
+            cur_nclick = "SHOW"
+    else:
+        sidebar_style = SIDEBAR_STYLE
+        content_style = CONTENT_STYLE
+        cur_nclick = 'SHOW'
+        
+    navbar_style = content_style.copy()
+    navbar_style["background-color"] = "#F5F7C3"
+    navbar_style["height"] = 100
+
+    return sidebar_style, content_style, cur_nclick
 
 @app.callback(
     Output('change-slider-container', 'children'),
