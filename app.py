@@ -2,16 +2,16 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 import natsort
 import dash
-import dash_core_components as dcc
+from dash import dcc
 import dash_bootstrap_components as dbc
-import dash_html_components as html
+from dash import html
 from dash.dependencies import Input, Output, State
 import pandas as pd
 from collections import Counter
 
 first = True
 
-lineagedict = dict(zip(['All Sequences', 'B.1.1.7','B.1.1.63', 'B.1.36', 'B.1.351', 'B.1.427', 'B.1.525', 'B.1.526', 'B.1.620', 'B.1.621', 'B.1.617.1', 'B.1.617.2', 'C.37', 'P.1', 'P.2'],
+lineagedict = dict(zip(['All Sequences', 'B.1.1.7', 'B.1.1.63', 'B.1.36', 'B.1.351', 'B.1.427', 'B.1.525', 'B.1.526', 'B.1.620', 'B.1.621', 'B.1.617.1', 'B.1.617.2', 'C.37', 'P.1', 'P.2'],
                        ['All', 'B117', 'B1163', 'B136', 'B1351', 'B1427', 'B1525', 'B1526', 'B1620', 'B1621', 'B16171', 'B16172', 'C37', 'P1', 'P2']))
 
 hrstyledict = dict(zip(['borderColor', 'margin', 'marginLeft', 'width'], ['#828282', 15, '-4%', '104%']))
