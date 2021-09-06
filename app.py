@@ -50,6 +50,7 @@ navbar = dbc.Navbar(
                 no_gutters=True,
             ),
             href="https://coronatrend.live",
+            style={'text-decoration': 'none'}
         ),
         dbc.NavbarToggler(id="navbar-toggler", n_clicks=0)
     ],
