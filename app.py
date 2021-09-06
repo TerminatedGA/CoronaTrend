@@ -51,8 +51,7 @@ navbar = dbc.Navbar(
             ),
             href="https://coronatrend.live",
         ),
-        dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
-        html.Span(dbc.Button("Toggle Sidebar", outline=True, color="secondary", id="btn_sidebar", style={'float': 'right'}), className="ml-auto")
+        dbc.NavbarToggler(id="navbar-toggler", n_clicks=0)
     ],
     color="#F5F7C3",
     dark=False,
@@ -69,21 +68,20 @@ SIDEBAR_STYLE = {
     "transition": "all 0.5s",
     "padding": "1rem 1rem",
     "background-color": "light",
-    "overflow": "scroll",
+    "overflow-y": "scroll",
     'borderLeftStyle': 'solid',
     'borderColor': '#828282'
 }
 
 SIDEBAR_HIDDEN = {
     "float": "right",
-    "left": "100%",
-    "width": "0%",
+    "left": "105%",
+    "width": 0,
     "height": 0,
     "z-index": 1,
     "transition": "all 0.5s",
-    "padding": "1rem 1rem",
     "background-color": "light",
-    "overflow": "scroll",
+    "overflow": "hidden"
 }
 
 # the styles for the main content position it to the right of the sidebar and
@@ -95,6 +93,7 @@ CONTENT_STYLE = {
     "height": "100%",
     "padding": "1rem 1rem",
     "background-color": "light",
+    'position': 'relative'
 }
 
 CONTENT_STYLE1 = {
@@ -104,6 +103,7 @@ CONTENT_STYLE1 = {
     "height": "100%",
     "padding": "1rem 1rem",
     "background-color": "light",
+    'position': 'relative'
 }
 
 content=html.Div(id='page-content',
@@ -129,8 +129,22 @@ content=html.Div(id='page-content',
                                 children=[dcc.Graph(id='pie-chart', 
                                                     style={'height': '90vh'},
                                                     config={"displaylogo": False})])])],
-            style={'height': 60})],
-            style={'width': '78vw', 'display': 'inline-block', 'vertical-align': 'top'})
+            style={'height': 60}),
+                          dbc.Button('>',
+                                     id='btn_sidebar',
+                                     style={'width': '0.5rem',
+                                            'height': '2rem',
+                                            'top': '20vh',
+                                            'right': '0vw',
+                                            'fontSize': 12,
+                                            'border-top-left-radius': '0.5rem',
+                                            'border-bottom-left-radius': '0.5rem',
+                                            'border-top-right-radius': '0rem',
+                                            'border-bottom-right-radius': '0rem',
+                                            'position': 'absolute',
+                                            'display': 'flex',
+                                            'align-items': 'center',
+                                            'justify-content': 'center'})])
 
 sidebar = html.Div(id='filter-sidebar',
              children=[    
@@ -295,7 +309,7 @@ app.layout = html.Div([
     dcc.Location(id="url"),       
     navbar,
     html.Div(children=[content, sidebar],
-             style={'width': '98vw'}),
+             style={'width': '98.72vw'}),
     footer])
 
 @app.callback(Output('acknowledgement-modal', 'style'),
@@ -313,6 +327,7 @@ def close_modal(selected_open, selected_close):
         Output("filter-sidebar", "style"),
         Output("page-content", "style"),
         Output("side_click", "data"),
+        Output("btn_sidebar", "children"),
     ],
 
     [Input("btn_sidebar", "n_clicks")],
@@ -326,20 +341,23 @@ def toggle_sidebar(n, nclick):
             sidebar_style = SIDEBAR_HIDDEN
             content_style = CONTENT_STYLE1
             cur_nclick = "HIDDEN"
+            button_text = "<"
         else:
             sidebar_style = SIDEBAR_STYLE
             content_style = CONTENT_STYLE
             cur_nclick = "SHOW"
+            button_text = ">"
     else:
         sidebar_style = SIDEBAR_STYLE
         content_style = CONTENT_STYLE
         cur_nclick = 'SHOW'
+        button_text = ">"
         
     navbar_style = content_style.copy()
     navbar_style["background-color"] = "#F5F7C3"
     navbar_style["height"] = 100
 
-    return sidebar_style, content_style, cur_nclick
+    return sidebar_style, content_style, cur_nclick, button_text
 
 @app.callback(
     Output('change-slider-container', 'children'),
