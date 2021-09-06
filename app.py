@@ -8,7 +8,6 @@ from dash import html
 from dash.dependencies import Input, Output, State
 import pandas as pd
 from collections import Counter
-
 first = True
 
 lineagedict = dict(zip(['All Sequences', 'B.1.1.7', 'B.1.1.63', 'B.1.36', 'B.1.351', 'B.1.427', 'B.1.525', 'B.1.526', 'B.1.620', 'B.1.621', 'B.1.617.1', 'B.1.617.2', 'C.37', 'P.1', 'P.2'],
@@ -31,13 +30,16 @@ server = app.server
 navbar = dbc.Navbar(
     id='navbar',
     children=[
-        html.A(
             # Use row and col to control vertical alignment of logo / brand
             dbc.Row(
                 [
-                    dbc.Col(html.Img(src=app.get_asset_url('images/CoronaTrend Logo.png'), height="100px", width = 100)),
-                    dbc.Col([html.Div('CoronaTrend',
-                                          style={'color': 'black', 'fontSize': 27, 'font-weight': 'bold'}),
+                    dbc.Col(html.A(html.Img(src=app.get_asset_url('images/CoronaTrend Logo.png'), height="100px", width = 100),
+                                   href="https://coronatrend.live",
+                                style={'text-decoration': 'none'})),
+                    dbc.Col([html.A(html.Div('CoronaTrend',
+                                              style={'color': 'black', 'fontSize': 27, 'font-weight': 'bold'}),
+                             href="https://coronatrend.live",
+                             style={'text-decoration': 'none'}),
                                  html.Div(children=[html.Div('Enabled by data from', 
                                                               style={'color': 'black', 'fontSize': 14, 'marginRight': 5, 'display': 'inline'}),
                                  html.A(href="https://www.gisaid.org/",
@@ -49,9 +51,6 @@ navbar = dbc.Navbar(
                 align="center",
                 no_gutters=True,
             ),
-            href="https://coronatrend.live",
-            style={'text-decoration': 'none'}
-        ),
         dbc.NavbarToggler(id="navbar-toggler", n_clicks=0)
     ],
     color="#F5F7C3",
