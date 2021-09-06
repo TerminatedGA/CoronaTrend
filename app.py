@@ -144,7 +144,9 @@ content=html.Div(id='page-content',
                                             'position': 'absolute',
                                             'display': 'flex',
                                             'align-items': 'center',
-                                            'justify-content': 'center'})])
+                                            'justify-content': 'center',
+                                            'background-color': '#828282',
+                                            'border': 'none'})])
 
 sidebar = html.Div(id='filter-sidebar',
              children=[    
