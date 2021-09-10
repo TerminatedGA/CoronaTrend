@@ -8,6 +8,7 @@ from dash import html
 from dash.dependencies import Input, Output, State
 import pandas as pd
 from collections import Counter
+
 first = True
 
 lineagedict = dict(zip(['All Sequences', 'B.1.1.7', 'B.1.1.63', 'B.1.36', 'B.1.351', 'B.1.427', 'B.1.525', 'B.1.526', 'B.1.620', 'B.1.621', 'B.1.617.1', 'B.1.617.2', 'C.37', 'P.1', 'P.2'],
@@ -365,7 +366,7 @@ def toggle_sidebar(n, nclick):
     Output('change-slider-container', 'children'),
     [Input('change-slider', 'value')])
 def update_output(value):
-    return 'Minimum increaase in prevalence: {}%'.format(value)
+    return 'Minimum increase in prevalence: {}%'.format(value)
 
 @app.callback(
     [Output('init-slider-container-min', 'children'), 
