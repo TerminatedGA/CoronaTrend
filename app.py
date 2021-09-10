@@ -211,13 +211,7 @@ sidebar = html.Div(id='filter-sidebar',
             type="number",
             value=10),
         html.Hr(style=hrstyledict),
-        html.Div([html.Div(children='Minimum increase in prevalence: (%)',
-                           id='change-slider-container',
-                 style={'display': 'inline'}),
-        dcc.Input(id='change-input',
-                  type='number',
-                  value=10,
-                  style={'display': 'inline'})]),
+        html.Div(id='change-slider-container'),
         dcc.RadioItems(id='change-radio',
                        options=[{'label': '(Final - Initial)', 'value': 'fin'},
                                 {'label': 'All-time', 'value': 'all'}],
@@ -230,16 +224,8 @@ sidebar = html.Div(id='filter-sidebar',
                value=10,
                step=0.5)]),
         html.Hr(style=hrstyledict),
-        html.Div(children='Minimum inital prevalence:',
-                 id='init-slider-container-min'),
-        dcc.Input(id='init-input-min',
-                  type='number',
-                  value=0),
-        html.Div(children='Maximum inital prevalence:',
-                 id='init-slider-container-max'),
-        dcc.Input(id='init-input-max',
-                  type='number',
-                  value=100),
+        html.Div(id='init-slider-container-min'),
+        html.Div(id='init-slider-container-max'),
         html.Div([dcc.RangeSlider(id='init-slider',
                    min=0,
                    max=100,
@@ -248,14 +234,6 @@ sidebar = html.Div(id='filter-sidebar',
 
 footer = html.Div(id='footer',
                   children=[dbc.Navbar(children=[html.Div(children=[
-                          html.Button("Acknowledgements",
-                                      id="acknowledgement-open-button",
-                                      style={'display': 'inline-block', 
-                                             'border': 'None', 
-                                             'outline': 'None',
-                                             'background': 'None',
-                                             'paddingRight': '50px'},
-                                      n_clicks=0),
                           html.Button("Acknowledgements",
                                       id="acknowledgement-open-button",
                                       style={'display': 'inline-block', 
@@ -306,7 +284,7 @@ html.Div([
         html.Div(children=["We gratefully acknowledge all data contributors, i.e. the Authors and their Originating laboratories responsible for obtaining the specimens, and their Submitting laboratories for generating the genetic sequence and metadata and sharing via the GISAID Initiative (1), on which this research is based.",
                            html.Br(),
                            html.Br(),
-                           html.Div([html.Div("1) Elbe, S., and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID’s innovative contribution to global health. Global Challenges, 1:33-46. DOI: ",
+                           html.Div([html.Div("1) Elbe, S., and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID’s innovative contribution to global health. Global Challenges, 1:33-46. DOI: ",
                                                style={'display': 'inline'}),
                                       dcc.Link("10.1002/gch2.1018",
                                                 target='_blank',
@@ -354,7 +332,6 @@ def close_modal(selected_open, selected_close):
         Output("side_click", "data"),
         Output("btn_sidebar", "children"),
     ],
-
     [Input("btn_sidebar", "n_clicks")],
     [
         State("side_click", "data"),
@@ -385,74 +362,17 @@ def toggle_sidebar(n, nclick):
     return sidebar_style, content_style, cur_nclick, button_text
 
 @app.callback(
-    [dash.dependencies.Output('change-input', 'value'),
-     dash.dependencies.Output('change-slider', 'value')],
-    [dash.dependencies.Input('change-input', 'value'),
-     dash.dependencies.Input('change-slider', 'value')]
-)
-def sync_change_value(input_value, slider_value):
-    input_value_update = False
-    if input_value is None:
-        input_value = 10
-        input_value_update = True
-    
-    if input_value_update is True:
-        input_value_output = input_value
-    else:
-        input_value_output = dash.no_update
-    
-    if input_value == slider_value:
-        return input_value_output, dash.no_update
-
-    if dash.callback_context.triggered[0]['prop_id'] == 'change-input.value':
-        return input_value_output, input_value
-    else:
-        return slider_value, dash.no_update
+    Output('change-slider-container', 'children'),
+    [Input('change-slider', 'value')])
+def update_output(value):
+    return 'Minimum increase in prevalence: {}%'.format(value)
 
 @app.callback(
-    [dash.dependencies.Output('init-input-min', 'value'),
-     dash.dependencies.Output('init-input-max', 'value'),
-     dash.dependencies.Output('init-slider', 'value')],
-    [dash.dependencies.Input('init-input-min', 'value'),
-     dash.dependencies.Input('init-input-max', 'value'),
-     dash.dependencies.Input('init-slider', 'value')]
-)
-def sync_init_value(input_value_min, input_value_max, slider_value):
-    input_value_min_update = False
-    input_value_max_update = False
-    #Swap min and max value if min value is larger than max value
-    if input_value_max < input_value_min:
-        temp = input_value_min
-        input_value_min = input_value_max
-        input_value_max = temp
-        input_value_min_update = True
-        input_value_max_update = True
-        
-    #Returns default value is input is None
-    if input_value_min is None:
-        input_value_min = 0
-        input_value_min_update = True
-    if input_value_max is None:
-        input_value_max = 100
-        input_value_max_update = True
-        
-    if input_value_min_update is True:
-        input_value_min_output = input_value_min
-    else:
-        input_value_min_output = dash.no_update
-        
-    if input_value_max_update is True:
-        input_value_max_output = input_value_max
-    else:
-        input_value_max_output = dash.no_update
-    
-    if [input_value_min, input_value_max] == slider_value:
-        return input_value_min_output, input_value_max_output, dash.no_update
-
-    if dash.callback_context.triggered[0]['prop_id'] in ['init-input-min.value', 'init-input-max.value']:
-        return input_value_min_output, input_value_max_output, [input_value_min, input_value_max]
-    else:
-        return slider_value[0], slider_value[1], dash.no_update
+    [Output('init-slider-container-min', 'children'), 
+     Output('init-slider-container-max', 'children')],
+    [Input('init-slider', 'value')])
+def update_output(value):
+    return 'Minimum inital prevalence: {}%'.format(value[0]), 'Maximum inital prevalence: {}%'.format(value[1])
 
 @app.callback(
     [Output('mutation-chart', 'figure'), 
