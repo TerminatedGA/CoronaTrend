@@ -320,6 +320,30 @@ html.Div([
         className='modal-content')],
                 id='acknowledgement-modal',
      className='modal',
+     style={"display": "none"}),
+                           html.Div([
+    html.Div([
+        html.Div([html.Div('Contact',
+                 style={'color': 'black', 
+                        'fontSize': 26, 
+                        'display':'inline', 
+                        'font-weight': 'bold'}),
+                 html.Button('✕', 
+                            id='contact-close-button',
+                            style={'float': 'right', 
+                                   'border': 'None', 
+                                   'outline': 'None',
+                                   'background': 'None'})],
+                 style={'paddingBottom': 20}),
+        html.Div(children=["For enquiries on CoronaTrend, please email ",
+                           dcc.Link("contact@coronatrend.live",
+                                                target='_blank',
+                                                href="mailto:contact@coronatrend.live"), 
+                           ". We will get to you as soon as possible."],
+                 style={'paddingBottom': 30})],
+        className='modal-content')],
+                id='contact-modal',
+     className='modal',
      style={"display": "none"})])
 
 app.layout = html.Div([
@@ -340,11 +364,21 @@ app.layout = html.Div([
 @app.callback(Output('acknowledgement-modal', 'style'),
               [Input('acknowledgement-open-button', 'n_clicks'),
                Input('acknowledgement-close-button', 'n_clicks')])
-def close_modal(selected_open, selected_close):
+def close_acknowledgement_modal(selected_open, selected_close):
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
     if 'acknowledgement-open-button' in changed_id:
         return {"display": "block"}
     if 'acknowledgement-close-button' in changed_id:
+        return {"display": "none"}
+    
+@app.callback(Output('contact-modal', 'style'),
+              [Input('contact-open-button', 'n_clicks'),
+               Input('contact-close-button', 'n_clicks')])
+def close_contact_modal(selected_open, selected_close):
+    changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
+    if 'contact-open-button' in changed_id:
+        return {"display": "block"}
+    if 'contact-close-button' in changed_id:
         return {"display": "none"}
 
 @app.callback(
