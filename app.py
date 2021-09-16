@@ -293,7 +293,7 @@ html.Div([
                                    'outline': 'None',
                                    'background': 'None'})],
                  style={'paddingBottom': 20}),
-        html.Div(children=["CoronaTrend aims to be a public resource from the The University of Hong Kong, detailing the prevalence of different mutations across different lineages as time passes. ", 
+        html.Div(children=["CoronaTrend aims to be a public resource from the Department of Microbiology, Li Ka Shing Faculty of Medicine, The University of Hong Kong, detailing the prevalence of different mutations across different lineages as time passes. ", 
                            html.Br(),
                            html.Br(),
                            "Developers: Mr. Chan Tze To, Mr. Jonathan Ip, Dr. Kelvin To"],
