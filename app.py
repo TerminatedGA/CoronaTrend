@@ -533,7 +533,7 @@ def multiple_output(selected_change_slider,
         countryerror = ""
     else:
         if selected_lineage != prevlineage:
-            url3 = 'GISAID-Dataframes/{}/{}_metadata.pickle'.format(selected_lineage, selected_lineage)
+            url3 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_metadata.pickle?raw=true'.format(selected_lineage, selected_lineage)
             prevlineage = selected_lineage
             metadata = pd.read_pickle(url3, compression = "gzip")
             countrylist = metadata[0]
