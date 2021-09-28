@@ -6,6 +6,7 @@ on:
       - master
     paths-ignore:
       - 'assets/**'
+      - 'GISAID-Dataframes/**'
 
 jobs:
   build:
