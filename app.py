@@ -8,7 +8,6 @@ from dash import html
 from dash.dependencies import Input, Output, State
 import pandas as pd
 from collections import Counter
-from jupyter_dash import JupyterDash
 
 first = True
 
@@ -20,7 +19,7 @@ index_html = open('assets/index.html', 'r')
 
 external_stylesheets = [dbc.themes.FLATLY, dbc.themes.BOOTSTRAP]
 
-app = JupyterDash(__name__, external_stylesheets=external_stylesheets, update_title='CoronaTrend - Loading')
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets, update_title='CoronaTrend - Loading')
 
 app.index_string = index_html.read()
 
