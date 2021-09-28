@@ -8,11 +8,11 @@ from dash import html
 from dash.dependencies import Input, Output, State
 import pandas as pd
 from collections import Counter
+from jupyter_dash import JupyterDash
 
 first = True
 
-lineagedict = dict(zip(['All Sequences', 'B.1.1.7', 'B.1.1.63', 'B.1.36', 'B.1.351', 'B.1.427', 'B.1.525', 'B.1.526', 'B.1.620', 'B.1.621', 'B.1.617.1', 'B.1.617.2', 'C.37', 'P.1', 'P.2'],
-                       ['All', 'B117', 'B1163', 'B136', 'B1351', 'B1427', 'B1525', 'B1526', 'B1620', 'B1621', 'B16171', 'B16172', 'C37', 'P1', 'P2']))
+lineages = pd.read_pickle('https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/metadata.pickle?raw=true', compression = "gzip")[0]
 
 hrstyledict = dict(zip(['borderColor', 'margin', 'marginLeft', 'width'], ['#828282', 15, '-4%', '104%']))
 
@@ -20,7 +20,7 @@ index_html = open('assets/index.html', 'r')
 
 external_stylesheets = [dbc.themes.FLATLY, dbc.themes.BOOTSTRAP]
 
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets, update_title='CoronaTrend - Loading')
+app = JupyterDash(__name__, external_stylesheets=external_stylesheets, update_title='CoronaTrend - Loading')
 
 app.index_string = index_html.read()
 
@@ -118,11 +118,9 @@ content=html.Div(id='page-content',
                                                     config={"displaylogo": False})]),
                       html.Div(["NOTES:", 
                                html.Br(), 
-                               "1. The time mentioned above refers to the collection date of each sequence.", 
+                               "1. The time mentioned above refers to the collection date of each sequence.",  
                                html.Br(), 
-                               "2. Only deletion and substitution mutations are shown. Insertion mutations cannot be shown.", 
-                               html.Br(), 
-                               "3. Sequenced regions with ambiguous bases (such as N) are treated as having no mutations."])]),
+                               "2. Sequenced regions with ambiguous bases (such as N) are treated as having no mutations."])]),
             #Graph 2: Gene Pie Chart
             dcc.Tab(label='Gene Pie Chart',
                     children=[dcc.Loading(
@@ -164,8 +162,8 @@ sidebar = html.Div(id='filter-sidebar',
         html.Div('Lineage:', 
                  style={'color': 'black', 'fontSize': 15}),
         dcc.Dropdown(id='lineage-dropdown',
-                     options=[{'label': list(lineagedict.keys())[x], 'value': list(lineagedict.values())[x]} for x in range(len(lineagedict))],
-                     value="B1351",
+                     options=[{'label': x, 'value': x} for x in lineages],
+                     value="B.1.1.7",
                      clearable=False),
         html.Hr(style=hrstyledict),
         html.Div('Country:', 
@@ -178,23 +176,14 @@ sidebar = html.Div(id='filter-sidebar',
                  children='', 
                  style={'color': 'red', 'fontSize': 10}),
         html.Hr(style=hrstyledict),
+        html.Div('Amino Acid Mutation:', 
+                 style={'color': 'black', 'fontSize': 15}),
         dcc.Input(id="mut-input", 
                   type="text", 
-                  placeholder="Search for mutation", 
                   list='mut-suggestion'),
         html.Div(id='mut-error-container',
                  children='', 
                  style={'color': 'red', 'fontSize': 10}),
-        dcc.RadioItems(id='change-mut',
-                   options=[{'label': 'AA Mutations', 'value': 'aamut'},
-                            {'label': 'Nucleotide Mutations', 'value': 'nuclmut'}],
-                   value='aamut',
-                   style={'fontSize': 13},
-                   labelStyle={'display': 'block'}),
-        html.Hr(style=hrstyledict),
-        dcc.Checklist(id='remove-syn-checkbox',
-                      options=[{'label': 'Hide Synonymous Mutations', 'value': 'drop'}],
-                      value = ['drop']),
         html.Hr(style=hrstyledict),
         html.Div('Gene:', 
                  style={'color': 'black', 'fontSize': 15}),
@@ -502,10 +491,8 @@ def sync_init_value(input_value_min, input_value_max, slider_value):
      Input('init-slider', 'value'), 
      Input('gene-dropdown', 'value'), 
      Input('mut-input', 'value'), 
-     Input('change-mut', 'value'), 
      Input('lineage-dropdown', 'value'), 
      Input('y-scale', 'value'),
-     Input('remove-syn-checkbox', 'value'),
      Input('country-input', 'value'),
      Input('total-input', 'value')])
 def multiple_output(selected_change_slider, 
@@ -513,10 +500,8 @@ def multiple_output(selected_change_slider,
                     selected_init, 
                     selected_gene, 
                     search_mut, 
-                    mut_radio, 
                     selected_lineage, 
                     selected_y_scale,
-                    remove_syn,
                     search_country,
                     input_total):
 #Update figure with user selection
@@ -549,7 +534,7 @@ def multiple_output(selected_change_slider,
         countryerror = ""
     else:
         if selected_lineage != prevlineage:
-            url3 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_metadata.pickle?raw=true'.format(selected_lineage, selected_lineage)
+            url3 = 'GISAID-Dataframes/{}/{}_metadata.pickle'.format(selected_lineage, selected_lineage)
             prevlineage = selected_lineage
             metadata = pd.read_pickle(url3, compression = "gzip")
             countrylist = metadata[0]
@@ -595,7 +580,7 @@ def multiple_output(selected_change_slider,
         piedf1 = pxdf1.copy()
 
         totallist = list(pxdf2original["Totals"])
-        periodlist1repeats = len(pxdf1original['Mutations'])
+        periodlist1repeats = len(pxdf1original['AA Label'])
         genelistfinal = natsort.natsorted(set(pxdf1original['Gene']))
         genelistfinal.insert(0, "All")
         deletedlist = []
@@ -609,7 +594,6 @@ def multiple_output(selected_change_slider,
         pxdf1 = pxdf1.explode('Percentage by period')
         if len(filtered_pxdf2['Periods']) == 0:
             pxdf1['Periods'] = None
-            pxdf1['Labels'] = ""
             grapherror = True
         else:
             pxdf1['Periods'] = list(filtered_pxdf2['Periods']) * periodlist1repeats
@@ -630,51 +614,37 @@ def multiple_output(selected_change_slider,
         changecolumn = 'Change in prevalence (All)(%)'
     else:
         changecolumn = 'Change in prevalence (Fin - Start)(%)'
-    if mut_radio == 'nuclmut':
-        mutcolumn = 'Mutations'
-    else:
-        mutcolumn = 'AA Label'
     if search_mut is None or search_mut == '':
-        searchmutline = (pxdf1[mutcolumn] != None)
-        searchmutpie = (piedf1[mutcolumn] != None)
+        searchmutline = (pxdf1['AA Label'] != None)
+        searchmutpie = (piedf1['AA Label'] != None)
     else: 
-        searchmutline = (pxdf1[mutcolumn].str.contains(search_mut, case=False)) 
-        searchmutpie = (piedf1[mutcolumn].str.contains(search_mut, case=False)) 
+        searchmutline = (pxdf1['AA Label'].str.contains(search_mut, case=False)) 
+        searchmutpie = (piedf1['AA Label'].str.contains(search_mut, case=False)) 
     if selected_gene == "All":
         selectedgeneline = (pxdf1['Gene'] != None)
         selectedgenepie = (piedf1['Gene'] != None)
     else:
         selectedgeneline = (pxdf1['Gene'] == selected_gene)
         selectedgenepie = (piedf1['Gene'] == selected_gene)
-    if remove_syn == ['drop']:
-        removesynline = (pxdf1['Synonymous'] == 'No')
-        removesynpie = (piedf1['Synonymous'] == 'No')
-    else:
-        removesynline = (pxdf1['Synonymous'] != None)
-        removesynpie = (piedf1['Synonymous'] != None)
         
         
  #Filters dataframe based on user selection       
-    def filter_df(df, selectedgene, searchmut, removesyn):
+    def filter_df(df, selectedgene, searchmut):
         return df[(df[changecolumn] >= selected_change_slider) & 
                            (df['Initial prevalence'] >= selected_init[0]) & 
                            (df['Initial prevalence'] <= selected_init[1]) &
                            selectedgene &
-                           searchmut &
-                           removesyn]
+                           searchmut]
     
-    filtered_pxdf1 = filter_df(pxdf1, selectedgeneline, searchmutline, removesynline)
+    filtered_pxdf1 = filter_df(pxdf1, selectedgeneline, searchmutline)
     
-    filtered_piedf1 =  filter_df(piedf1, selectedgenepie, searchmutpie, removesynpie)
+    filtered_piedf1 =  filter_df(piedf1, selectedgenepie, searchmutpie)
 
 #Count the genes for each amino acid mutation
     piedict = Counter(filtered_piedf1['Gene'])
 
     #Create new mutation suggestion list for search bar
-    if mut_radio == 'nuclmut':
-        mutsuggestlist = natsort.natsorted(set(filtered_pxdf1['Mutations']))
-    else:
-        mutsuggestlist = natsort.natsorted(set(filtered_pxdf1['AA Label']))
+    mutsuggestlist = natsort.natsorted(set(filtered_pxdf1['AA Label']))
     
     #Returns error if searched mutation is invalid
     if int(len(filtered_pxdf1)) == 0 and search_mutoriginal is not None:
@@ -686,8 +656,8 @@ def multiple_output(selected_change_slider,
     fig1 = px.line(filtered_pxdf1,
                 x = 'Periods',
                 y = 'Percentage by period', 
-                color = 'Labels',
-                custom_data = [filtered_pxdf1['Labels']])
+                color = 'AA Label',
+                custom_data = [filtered_pxdf1['AA Label']])
     fig1.update_traces(hovertemplate='<b>%{customdata[0]}</b><br><br>Week: %{x}<br>Prevalence: %{y}'+'%'+'<extra></extra>')
     
     #Create chart showing sample size of sequence in each time point 
