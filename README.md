@@ -6,11 +6,11 @@ CoronaTrend visualizes data from dataframes generated using GISAID sequences to 
 
 The website is live at [coronatrend.live](https://coronatrend.live)
 
-Dataframes are generated using _dataframegen.py_ found in [github.com/TerminatedGA/GISAID-Dataframes](https://github.com/TerminatedGA/GISAID-Dataframes)\.
+Dataframes are generated using _provision.sh_.
 
 ## Notes ##
-
-1. Sequences where a position has an ambiguous base (e.g. N) are treated as no mutations.
+1. CoronaTrend is able to show substitution mutations, insertion mutations and deletion mutations.
+2. Sequences where a position has an ambiguous base (e.g. N) are treated as no mutations.
 
 ## Known bugs ##
 
@@ -28,8 +28,9 @@ We gratefully acknowledge all data contributors, i.e. the Authors and their Orig
 1) Elbe, S., and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID’s innovative contribution to global health. Global Challenges, 1:33-46. DOI: [10.1002/gch2.1018](https://dx.doi.org/10.1002/gch2.1018) PMCID: [31565258](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6607375/)
 
 ## Contact ##
+All enquires regarding CoronaTrend can be sent to contact@coronatrend.live.
 
 Author: Chan Tze To\
-Email: tzetochan@connect.hku.hk
+Email: tzetochan@connect.hku.hk 
 
 
