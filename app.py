@@ -11,8 +11,6 @@ from collections import Counter
 
 first = True
 
-lineages = pd.read_pickle('https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/metadata.pickle?raw=true', compression = "gzip")[0]
-
 hrstyledict = dict(zip(['borderColor', 'margin', 'marginLeft', 'width'], ['#828282', 15, '-4%', '104%']))
 
 index_html = open('assets/index.html', 'r')
@@ -161,7 +159,7 @@ sidebar = html.Div(id='filter-sidebar',
         html.Div('Lineage:', 
                  style={'color': 'black', 'fontSize': 15}),
         dcc.Dropdown(id='lineage-dropdown',
-                     options=[{'label': x, 'value': x} for x in lineages],
+                     options=[{'label': x, 'value': x} for x in pd.read_pickle('https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/metadata.pickle?raw=true', compression = "gzip")[0]],
                      value="B.1.1.7",
                      clearable=False),
         html.Hr(style=hrstyledict),
@@ -484,7 +482,8 @@ def sync_init_value(input_value_min, input_value_max, slider_value):
      Output('country-suggestion', 'children'),
      Output('country-error-container', 'children'),
      Output('graph-error-container', 'children'),
-     Output('mut-error-container', 'children')],
+     Output('mut-error-container', 'children'),
+     Output('lineage-dropdown', 'options')],
     [Input('change-slider', 'value'), 
      Input('change-radio', 'value'), 
      Input('init-slider', 'value'), 
@@ -522,7 +521,7 @@ def multiple_output(selected_change_slider,
         global prevlineage
         global prevlineage1
         global prevtotal1
-        url3 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_metadata.pickle?raw=true'.format(selected_lineage, selected_lineage)
+        url3 = 'GISAID-Dataframes/{}/{}_metadata.pickle'.format(selected_lineage, selected_lineage)
         prevlineage = selected_lineage
         prevtotal1 = input_total
         metadata = pd.read_pickle(url3, compression = "gzip")
@@ -533,7 +532,7 @@ def multiple_output(selected_change_slider,
         countryerror = ""
     else:
         if selected_lineage != prevlineage:
-            url3 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_metadata.pickle?raw=true'.format(selected_lineage, selected_lineage)
+            url3 = 'GISAID-Dataframes/{}/{}_metadata.pickle'.format(selected_lineage, selected_lineage)
             prevlineage = selected_lineage
             metadata = pd.read_pickle(url3, compression = "gzip")
             countrylist = metadata[0]
@@ -569,8 +568,8 @@ def multiple_output(selected_change_slider,
     
     #Fetches new dataframe upon new user selection and generates required lists
     if first == True or prevtotal1 != input_total or prevlineage1 != selected_lineage or prevcountry1 != search_country:
-        url1 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_1.feather?raw=true'.format(selected_lineage, selected_lineage, search_country)
-        url2 = 'https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/{}/{}_{}_2.feather?raw=true'.format(selected_lineage, selected_lineage, search_country)
+        url1 = 'GISAID-Dataframes/{}/{}_{}_1.feather'.format(selected_lineage, selected_lineage, search_country)
+        url2 = 'GISAID-Dataframes/{}/{}_{}_2.feather'.format(selected_lineage, selected_lineage, search_country)
         pxdf1original = pd.read_feather(url1)
         pxdf2original = pd.read_feather(url2)
         
@@ -703,7 +702,7 @@ def multiple_output(selected_change_slider,
     else:
         grapherrortext = ""
         
-    return pxfig1, piefig1, [html.Option(value=word) for word in mutsuggestlist], [{'label': x, 'value': x} for x in genelistfinal], [html.Option(value=word) for word in countrylist], countryerror, grapherrortext, muterror
+    return pxfig1, piefig1, [html.Option(value=word) for word in mutsuggestlist], [{'label': x, 'value': x} for x in genelistfinal], [html.Option(value=word) for word in countrylist], countryerror, grapherrortext, muterror, [{'label': x, 'value': x} for x in pd.read_pickle('GISAID-Dataframes/metadata.pickle', compression = "gzip")[0]],
 
 if __name__ == '__main__':
     app.run_server()
