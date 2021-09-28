@@ -9,7 +9,7 @@ on:
       - 'dataframegen.py'
       - 'deleteprovision.py'
       - 'splitprovision.py'
-      - 'README.md
+      - 'README.md'
 jobs:
   build:
 
