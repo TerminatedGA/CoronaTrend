@@ -8,12 +8,17 @@ from dash import html
 from dash.dependencies import Input, Output, State
 import pandas as pd
 from collections import Counter
+from github import Github
 
 first = True
 
 hrstyledict = dict(zip(['borderColor', 'margin', 'marginLeft', 'width'], ['#828282', 15, '-4%', '104%']))
 
 index_html = open('assets/index.html', 'r')
+
+repo = Github().get_repo("TerminatedGA/CoronaTrend")
+commits = repo.get_commits(path='GISAID-Dataframes')
+lastupdated = commits[0].commit.committer.date
 
 external_stylesheets = [dbc.themes.FLATLY, dbc.themes.BOOTSTRAP]
 
@@ -105,7 +110,13 @@ CONTENT_STYLE1 = {
 }
 
 content=html.Div(id='page-content',
-                 children=[dcc.Tabs([
+                 children=[html.Div(id='last-updated',
+                                    children='Last updated: ' + str(lastupdated),
+                                    style={'textAlign': 'right'}),
+                           dcc.Interval(id='last-updated-interval',
+                                        interval=10*60*1000, # in milliseconds
+                                        n_intervals=0),
+                           dcc.Tabs([
             #Graph 1: Mutation graph
             dcc.Tab(label='Mutation graph', 
                     children=[dcc.Loading(
@@ -162,6 +173,9 @@ sidebar = html.Div(id='filter-sidebar',
                      options=[{'label': x, 'value': x} for x in pd.read_pickle('https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/metadata.pickle?raw=true', compression = "gzip")[0]],
                      value="B.1.1.7",
                      clearable=False),
+        dcc.Interval(id='lineage-dropdown-interval',
+                     interval=10*60*1000, # in milliseconds
+                     n_intervals=0),
         html.Hr(style=hrstyledict),
         html.Div('Country:', 
                  style={'color': 'black', 'fontSize': 15}),
@@ -347,6 +361,16 @@ app.layout = html.Div([
              style={'width': '98.72vw'}),
     footer])
 
+@app.callback(Output('last-updated', 'children'),
+              [Input('last-updated-interval', 'n_intervals')])
+def update_date(n):
+    return 'Last updated: ' + str(lastupdated)
+    
+@app.callback(Output('lineage-dropdown', 'options'),
+              [Input('lineage-dropdown-interval', 'n_intervals')])
+def update_date(n):
+    return [{'label': x, 'value': x} for x in pd.read_pickle('https://github.com/TerminatedGA/GISAID-Dataframes/blob/master/metadata.pickle?raw=true', compression = "gzip")[0]]
+    
 @app.callback(Output('acknowledgement-modal', 'style'),
               [Input('acknowledgement-open-button', 'n_clicks'),
                Input('acknowledgement-close-button', 'n_clicks')])
@@ -482,8 +506,7 @@ def sync_init_value(input_value_min, input_value_max, slider_value):
      Output('country-suggestion', 'children'),
      Output('country-error-container', 'children'),
      Output('graph-error-container', 'children'),
-     Output('mut-error-container', 'children'),
-     Output('lineage-dropdown', 'options')],
+     Output('mut-error-container', 'children')],
     [Input('change-slider', 'value'), 
      Input('change-radio', 'value'), 
      Input('init-slider', 'value'), 
@@ -702,7 +725,7 @@ def multiple_output(selected_change_slider,
     else:
         grapherrortext = ""
         
-    return pxfig1, piefig1, [html.Option(value=word) for word in mutsuggestlist], [{'label': x, 'value': x} for x in genelistfinal], [html.Option(value=word) for word in countrylist], countryerror, grapherrortext, muterror, [{'label': x, 'value': x} for x in pd.read_pickle('GISAID-Dataframes/metadata.pickle', compression = "gzip")[0]],
+    return pxfig1, piefig1, [html.Option(value=word) for word in mutsuggestlist], [{'label': x, 'value': x} for x in genelistfinal], [html.Option(value=word) for word in countrylist], countryerror, grapherrortext, muterror
 
 if __name__ == '__main__':
     app.run_server()
