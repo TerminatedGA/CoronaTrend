@@ -10,7 +10,9 @@
 }
 
 .modal-content {
-    margin: 90px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
     padding: 30px;
     width: 60vw;
     align-content: center;

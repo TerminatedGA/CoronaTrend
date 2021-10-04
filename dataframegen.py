@@ -73,7 +73,7 @@ with open("provision.json", 'r') as provision:
             sequencelistmid = line['covv_accession_id']
             lineagelistmid = line['covv_lineage']
             locations = [location.strip() for location in line['covv_location'].split('/')]
-            countrylistmid = locations[1]
+            countrylistmid = locations[1].replace("Hong Kong", "Hong Kong SAR")
             aamutationsplit = re.split(',|_', line['covsurver_prot_mutations'].translate({ord(ch):' ' for ch in '()'}).strip())
             aalabellistlistmid = []
             for gene, aamut in zip(aamutationsplit[::2], aamutationsplit[1::2]):
