@@ -177,7 +177,7 @@ sidebar = html.Div(id='filter-sidebar',
                      interval=10*60*1000, # in milliseconds
                      n_intervals=0),
         html.Hr(style=hrstyledict),
-        html.Div('Country:', 
+        html.Div('Country  / Region:', 
                  style={'color': 'black', 'fontSize': 15}),
         dcc.Input(id='country-input',
                   type='text',
