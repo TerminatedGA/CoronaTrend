@@ -12,6 +12,7 @@ import datetime as dt
 from datetime import datetime
 from bs4 import BeautifulSoup
 import pycurl_requests as requests
+import lzma
 
 lineagelimit = 20
 minall = 0
@@ -26,6 +27,9 @@ def datetimeable(date):
         return True
     except:
         return False
+        
+compile1 = re.compile("#anchor_1632150752495")
+compile2 = re.compile("https://www.cdc.gov/coronavirus/2019-ncov/variants/variant-info.html")
     
 def uscdclineage(url):
     r = requests.get(url)
@@ -39,12 +43,12 @@ def uscdclineage(url):
     for block in li:
         if block.findPreviousSibling("li") is not None:
             for block2 in block.findPreviousSibling("li"):
-                if block2.findPreviousSibling("a", href=re.compile("#anchor_1632150752495")) is not None:
+                if block2.findPreviousSibling("a", href=compile1) is not None:
                     for block3 in block2:
                         match = re.search(r'\((.+)\)', str(block3))
                         if match:
                             voilineagelist.append(re.split(', | and ', match.group(0).strip('()')))
-                if block2.findPreviousSibling("a", href=re.compile("https://www.cdc.gov/coronavirus/2019-ncov/variants/variant-info.html")) is not None:
+                if block2.findPreviousSibling("a", href=compile2) is not None:
                     for block3 in block2:
                         match = re.search(r'\((.+)\)', str(block3))
                         if match:
@@ -64,7 +68,7 @@ def uscdclineage(url):
     return lineagelist2
 
 print("Stage 1 of 3: Generating stats for each sequence")
-with open("provision.json", 'r') as provision:
+with lzma.open("provision.json.xz", 'r') as provision:
     def loop1(jsonline):
         line = json.loads(jsonline)
         if line['covv_host'] == 'Human' and line['is_high_coverage'] is True and line['is_complete'] is True and line['n_content'] <= 0.05 and datetimeable(line['covv_collection_date']):
@@ -102,14 +106,24 @@ for lineage in lineagelist2:
 lineagesorted = natsorted(list(set(lineagesorted[:20] + lineagelist1)))
 lineagesorted.insert(0, "All")
 
+lineagelist1 = None
+lineagelist2 = None
+
 print('Generating week from date')
 
 mutationdata = {"Week": pd.Series(weeklist, dtype='category'), 
                 "Country": pd.Series(countrylist, dtype='category'), 
                 "Lineage": pd.Series(lineagelist, dtype='category'), 
                 "AA Mutations": aalabellistlist}
+
 mutationdf = pd.DataFrame(mutationdata)
 mutationdf.index = sequencelist
+
+weeklist = None
+sequencelist = None
+lineagelist = None
+countrylist = None
+aalabellistlist = None
 
 print("Lineages to be parsed: " + ", ".join(lineagesorted))
 

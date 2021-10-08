@@ -1,7 +1,7 @@
 import os
 
 try:
-    os.remove('provision.json')
-    print('Deleted "provision.json"')
+    os.remove('provision.json.xz')
+    print('Deleted "provision.json.xz"')
 except OSError:
-    print('Error: Unable to delete "provison.json": "provison.json" does not exist!')
+    print('Error: Unable to delete "provison.json.xz": "provison.json.xz" does not exist!')
