@@ -9,15 +9,13 @@ The website is live at [coronatrend.live](https://coronatrend.live)
 Dataframes are generated using _provision.sh_.
 
 ## Notes ##
-1. CoronaTrend is able to show substitution mutations, insertion mutations and deletion mutations.
+1. CoronaTrend is able to show substitution mutations, insertion mutations, deletion mutations and nonsense mutations..
 2. Sequences where a position has an ambiguous base (e.g. N) are treated as no mutations.
 
 ## Known bugs ##
 
 1. Setting 'Increase in Prevalence' to a negative value may cause the graph to fail to load.
 2. Showing all data from all sequences takes a long time to load.
-3. The 'Minimum Increase in Prevalence' parameter only takes account of cases with all dates included.
-   Dates filtered with the 'Minimum total number of sequences per time period' are not taken into account.
    
 ## Acknowledgements ##
 

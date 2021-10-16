@@ -110,9 +110,12 @@ CONTENT_STYLE1 = {
 }
 
 content=html.Div(id='page-content',
-                 children=[html.Div(id='last-updated',
+                 children=[html.Div(id='graph-error-container',
+                                    children='', 
+                                    style={'color': 'red', 'fontSize': 10}),
+                           html.Div(id='last-updated',
                                     children='Last updated: ' + str(lastupdated),
-                                    style={'textAlign': 'right'}),
+                                    style={'textAlign': 'left'}),
                            dcc.Interval(id='last-updated-interval',
                                         interval=10*60*1000, # in milliseconds
                                         n_intervals=0),
@@ -206,10 +209,11 @@ sidebar = html.Div(id='filter-sidebar',
         html.Hr(style=hrstyledict),
         html.Div('Minimum total number of sequences per time period:', 
                  style={'color': 'black', 'fontSize': 15}),
-        dcc.Input(
-            id="total-input",
-            type="number",
-            value=10),
+        dcc.RadioItems(
+            id='total-radio',
+            options=[{'label': x, 'value': x} for x in [0, 10, 100, 1000]],
+            value=100,
+            labelStyle={'display': 'block'}),
         html.Hr(style=hrstyledict),
         html.Div([html.Div(children='Minimum increase in prevalence: (%)',
                            id='change-slider-container',
@@ -351,9 +355,6 @@ app.layout = html.Div([
                   children=[html.Option(value=word) for word in []]),
     html.Datalist(id='country-suggestion', 
                   children=[html.Option(value=word) for word in []]),
-    html.Div([html.Div(id='graph-error-container',
-                 children='', 
-                 style={'color': 'red', 'fontSize': 10})]),
     dcc.Store(id='side_click'),
     dcc.Location(id="url"),       
     navbar,
@@ -464,20 +465,20 @@ def sync_change_value(input_value, slider_value):
 def sync_init_value(input_value_min, input_value_max, slider_value):
     input_value_min_update = False
     input_value_max_update = False
+        #Returns default value is input is None
+    if input_value_min is None:
+        input_value_min = 0
+        input_value_min_update = True
+    if input_value_max is None:
+        input_value_max = 100
+        input_value_max_update = True
+
     #Swap min and max value if min value is larger than max value
     if input_value_max < input_value_min:
         temp = input_value_min
         input_value_min = input_value_max
         input_value_max = temp
         input_value_min_update = True
-        input_value_max_update = True
-        
-    #Returns default value is input is None
-    if input_value_min is None:
-        input_value_min = 0
-        input_value_min_update = True
-    if input_value_max is None:
-        input_value_max = 100
         input_value_max_update = True
         
     if input_value_min_update is True:
@@ -515,7 +516,7 @@ def sync_init_value(input_value_min, input_value_max, slider_value):
      Input('lineage-dropdown', 'value'), 
      Input('y-scale', 'value'),
      Input('country-input', 'value'),
-     Input('total-input', 'value')])
+     Input('total-radio', 'value')])
 def multiple_output(selected_change_slider, 
                     selected_change_radio, 
                     selected_init, 
@@ -524,7 +525,7 @@ def multiple_output(selected_change_slider,
                     selected_lineage, 
                     selected_y_scale,
                     search_country,
-                    input_total):
+                    selected_total_radio):
 #Update figure with user selection
     #Check if graph has error
     grapherror = False
@@ -532,8 +533,6 @@ def multiple_output(selected_change_slider,
     #Defaults
     if search_country == "":
         search_country = 'All'
-    if input_total is None:
-        input_total = 0
 
     #Updates country search bar results
     global first
@@ -544,21 +543,27 @@ def multiple_output(selected_change_slider,
         global prevlineage
         global prevlineage1
         global prevtotal1
-        url3 = 'GISAID-Dataframes/{}/{}_metadata.pickle'.format(selected_lineage, selected_lineage)
+        url3 = 'GISAID-Dataframes/{}/{}/{}_metadata_Mintotal{}.pickle'.format(selected_lineage, selected_total_radio, selected_lineage, selected_total_radio)
         prevlineage = selected_lineage
-        prevtotal1 = input_total
+        prevtotal1 = selected_total_radio
         metadata = pd.read_pickle(url3, compression = "gzip")
         countrylist = metadata[0]
+        if len(countrylist) == 0:
+            grapherror = True
+            print("oops")
         prevcountry = "All"
         prevcountry1 = search_country
         prevlineage1 = selected_lineage
         countryerror = ""
     else:
-        if selected_lineage != prevlineage:
-            url3 = 'GISAID-Dataframes/{}/{}_metadata.pickle'.format(selected_lineage, selected_lineage)
+        if selected_lineage != prevlineage or selected_total_radio != prevtotal1:
+            url3 = 'GISAID-Dataframes/{}/{}/{}_metadata_Mintotal{}.pickle'.format(selected_lineage, selected_total_radio, selected_lineage, selected_total_radio)
             prevlineage = selected_lineage
             metadata = pd.read_pickle(url3, compression = "gzip")
             countrylist = metadata[0]
+            if len(countrylist) == 0:
+                grapherror = True
+                print("oops")
         #Prevents graph update until a valid country is input
         if search_country not in countrylist and search_country != "All":
             countryerror = "Error: {} is not a valid option!".format(search_country)
@@ -590,9 +595,9 @@ def multiple_output(selected_change_slider,
         search_mutoriginal = None
     
     #Fetches new dataframe upon new user selection and generates required lists
-    if first == True or prevtotal1 != input_total or prevlineage1 != selected_lineage or prevcountry1 != search_country:
-        url1 = 'GISAID-Dataframes/{}/{}_{}_1.feather'.format(selected_lineage, selected_lineage, search_country)
-        url2 = 'GISAID-Dataframes/{}/{}_{}_2.feather'.format(selected_lineage, selected_lineage, search_country)
+    if [first == True or prevtotal1 != selected_total_radio or prevlineage1 != selected_lineage or prevcountry1 != search_country] and grapherror == False:
+        url1 = 'GISAID-Dataframes/{}/{}/{}_{}_1_Mintotal{}.feather'.format(selected_lineage, selected_total_radio, selected_lineage, search_country, selected_total_radio)
+        url2 = 'GISAID-Dataframes/{}/{}/{}_{}_2_Mintotal{}.feather'.format(selected_lineage, selected_total_radio, selected_lineage, search_country, selected_total_radio)
         pxdf1original = pd.read_feather(url1)
         pxdf2original = pd.read_feather(url2)
         
@@ -604,14 +609,10 @@ def multiple_output(selected_change_slider,
         periodlist1repeats = len(pxdf1original['AA Label'])
         genelistfinal = natsort.natsorted(set(pxdf1original['Gene']))
         genelistfinal.insert(0, "All")
-        deletedlist = []
-        for x in range(len(totallist)):
-            if totallist[x] < input_total:
-                deletedlist.append(x)
 
-        filtered_pxdf2 = pxdf2.drop(deletedlist)
+        filtered_pxdf2 = pxdf2
 
-        pxdf1["Percentage by period"] = [[a[b] for b in range(len(a)) if b not in deletedlist] for a in pxdf1original["Percentage by period"]]
+        pxdf1["Percentage by period"] = pxdf1original["Percentage by period"]
         pxdf1 = pxdf1.explode('Percentage by period')
         if len(filtered_pxdf2['Periods']) == 0:
             pxdf1['Periods'] = None
@@ -622,7 +623,7 @@ def multiple_output(selected_change_slider,
         if first == True:
             first = False
         else:
-            prevtotal1 = input_total
+            prevtotal1 = selected_total_radio
             prevlineage1 = selected_lineage
             prevcountry1 = search_country
     
