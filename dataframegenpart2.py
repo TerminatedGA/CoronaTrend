@@ -71,7 +71,7 @@ for index, lineage in zip(range(len(lineagesorted)), lineagesorted):
         periodlist1 = []
 
         for totals in range(len(totallist)):
-        	if totallist[totals] > float(inputtotal):
+        	if totallist[totals] >= float(inputtotal):
 	            mutationtablebytimefiltered = mutationtablebytimefiltered.join(mutationtablebytimeraw.iloc[:,totals])
 	            totallist1.append(totallist[totals])
 	            periodlist1.append(periodlist[totals])

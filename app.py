@@ -209,11 +209,11 @@ sidebar = html.Div(id='filter-sidebar',
         html.Hr(style=hrstyledict),
         html.Div('Minimum total number of sequences per time period:', 
                  style={'color': 'black', 'fontSize': 15}),
-        dcc.RadioItems(
-            id='total-radio',
+        dcc.Dropdown(
+            id='total-dropdown',
             options=[{'label': x, 'value': x} for x in [0, 10, 100, 1000]],
             value=100,
-            labelStyle={'display': 'block'}),
+            clearable=False),
         html.Hr(style=hrstyledict),
         html.Div([html.Div(children='Minimum increase in prevalence: (%)',
                            id='change-slider-container',
@@ -516,7 +516,7 @@ def sync_init_value(input_value_min, input_value_max, slider_value):
      Input('lineage-dropdown', 'value'), 
      Input('y-scale', 'value'),
      Input('country-input', 'value'),
-     Input('total-radio', 'value')])
+     Input('total-dropdown', 'value')])
 def multiple_output(selected_change_slider, 
                     selected_change_radio, 
                     selected_init, 
@@ -525,7 +525,7 @@ def multiple_output(selected_change_slider,
                     selected_lineage, 
                     selected_y_scale,
                     search_country,
-                    selected_total_radio):
+                    selected_total):
 #Update figure with user selection
     #Check if graph has error
     grapherror = False
@@ -543,9 +543,9 @@ def multiple_output(selected_change_slider,
         global prevlineage
         global prevlineage1
         global prevtotal1
-        url3 = 'GISAID-Dataframes/{}/{}/{}_metadata_Mintotal{}.pickle'.format(selected_lineage, selected_total_radio, selected_lineage, selected_total_radio)
+        url3 = 'GISAID-Dataframes/{}/{}/{}_metadata_Mintotal{}.pickle'.format(selected_lineage, selected_total, selected_lineage, selected_total)
         prevlineage = selected_lineage
-        prevtotal1 = selected_total_radio
+        prevtotal1 = selected_total
         metadata = pd.read_pickle(url3, compression = "gzip")
         countrylist = metadata[0]
         if len(countrylist) == 0:
@@ -556,8 +556,8 @@ def multiple_output(selected_change_slider,
         prevlineage1 = selected_lineage
         countryerror = ""
     else:
-        if selected_lineage != prevlineage or selected_total_radio != prevtotal1:
-            url3 = 'GISAID-Dataframes/{}/{}/{}_metadata_Mintotal{}.pickle'.format(selected_lineage, selected_total_radio, selected_lineage, selected_total_radio)
+        if selected_lineage != prevlineage or selected_total != prevtotal1:
+            url3 = 'GISAID-Dataframes/{}/{}/{}_metadata_Mintotal{}.pickle'.format(selected_lineage, selected_total, selected_lineage, selected_total)
             prevlineage = selected_lineage
             metadata = pd.read_pickle(url3, compression = "gzip")
             countrylist = metadata[0]
@@ -595,9 +595,9 @@ def multiple_output(selected_change_slider,
         search_mutoriginal = None
     
     #Fetches new dataframe upon new user selection and generates required lists
-    if [first == True or prevtotal1 != selected_total_radio or prevlineage1 != selected_lineage or prevcountry1 != search_country] and grapherror == False:
-        url1 = 'GISAID-Dataframes/{}/{}/{}_{}_1_Mintotal{}.feather'.format(selected_lineage, selected_total_radio, selected_lineage, search_country, selected_total_radio)
-        url2 = 'GISAID-Dataframes/{}/{}/{}_{}_2_Mintotal{}.feather'.format(selected_lineage, selected_total_radio, selected_lineage, search_country, selected_total_radio)
+    if [first == True or prevtotal1 != selected_total or prevlineage1 != selected_lineage or prevcountry1 != search_country] and grapherror == False:
+        url1 = 'GISAID-Dataframes/{}/{}/{}_{}_1_Mintotal{}.feather'.format(selected_lineage, selected_total, selected_lineage, search_country, selected_total)
+        url2 = 'GISAID-Dataframes/{}/{}/{}_{}_2_Mintotal{}.feather'.format(selected_lineage, selected_total, selected_lineage, search_country, selected_total)
         pxdf1original = pd.read_feather(url1)
         pxdf2original = pd.read_feather(url2)
         
@@ -623,7 +623,7 @@ def multiple_output(selected_change_slider,
         if first == True:
             first = False
         else:
-            prevtotal1 = selected_total_radio
+            prevtotal1 = selected_total
             prevlineage1 = selected_lineage
             prevcountry1 = search_country
     
