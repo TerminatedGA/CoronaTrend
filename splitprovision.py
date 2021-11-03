@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import fileinput
 import json
 #with open("provision.fasta", "w+") as fasta:
