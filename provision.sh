@@ -8,4 +8,5 @@ python ./dataframegenpart2.py --mintotal 10 &&
 python ./dataframegenpart2.py --mintotal 100 &&
 python ./dataframegenpart2.py --mintotal 1000 &&
 python ./deleteprovision.py;
+python ./gitpush.py;
 
