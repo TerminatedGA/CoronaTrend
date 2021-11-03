@@ -1,9 +1,11 @@
+#!/usr/bin/env python
+import multiprocess
 import fileinput
 import json
-#with open("provision.fasta", "w+") as fasta:
-for jsonline in fileinput.input():
+
+
+def split(jsonline):
     line = json.loads(jsonline)
-    #fasta.write('>{}\n{}\n'.format(line['covv_accession_id'], line['sequence'].replace('\n', '')))
     filterlist = ['sequence', 
                   'covv_virus_name', 
                   'covv_type', 
@@ -19,3 +21,6 @@ for jsonline in fileinput.input():
     for element in filterlist:
     	line.pop(element)
     print('{}\n'.format(json.dumps(line)), end = '')
+
+p = multiprocess.Pool()
+gen = list(p.imap(split, fileinput.input(), chunksize=2000))
