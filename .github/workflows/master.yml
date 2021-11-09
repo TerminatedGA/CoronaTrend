@@ -26,4 +26,3 @@ jobs:
             ssh-private-key: ${{ secrets.CORONAKEY }}
             dokku-host: ${{ secrets.CORONAHOST }}
             app-name: coronatrend
- 
