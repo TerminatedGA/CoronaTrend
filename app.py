@@ -365,7 +365,7 @@ app.layout = html.Div([
 @app.callback(Output('last-updated', 'children'),
               [Input('last-updated-interval', 'n_intervals')])
 def update_date(n):
-    return 'Last updated: ' + str(lastupdated)
+    return 'Last updated: ' + str(lastupdated) + ' (UTC +0)'
     
 @app.callback(Output('lineage-dropdown', 'options'),
               [Input('lineage-dropdown-interval', 'n_intervals')])
