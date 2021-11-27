@@ -114,7 +114,7 @@ content=html.Div(id='page-content',
                                     children='', 
                                     style={'color': 'red', 'fontSize': 10}),
                            html.Div(id='last-updated',
-                                    children='Last updated: ' + str(lastupdated),
+                                    children='Last updated: ' + str(lastupdated) + ' (UTC +0)',
                                     style={'textAlign': 'left'}),
                            dcc.Interval(id='last-updated-interval',
                                         interval=10*60*1000, # in milliseconds
