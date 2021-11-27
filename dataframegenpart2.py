@@ -24,7 +24,7 @@ mutationdf = pd.read_feather('GISAID-Dataframes/part1temp.feather')
 mutationdf.set_index('index')
 lineagesorted = pd.read_pickle('GISAID-Dataframes/metadata.pickle', compression = "gzip")[0]
 
-print('Minimum total number of sequences per period to be parsed: {}'.join(inputtotal))
+print('Minimum total number of sequences per period to be parsed: {}'.format(inputtotal))
 print("Lineages to be parsed: " + ", ".join(lineagesorted))
 
 for index, lineage in zip(range(len(lineagesorted)), lineagesorted):
