@@ -596,8 +596,8 @@ def multiple_output(selected_change_slider,
     
     #Fetches new dataframe upon new user selection and generates required lists
     if [first == True or prevtotal1 != selected_total or prevlineage1 != selected_lineage or prevcountry1 != search_country] and grapherror == False:
-        url1 = 'GISAID-Dataframes/{}/{}/{}_{}_1_Mintotal{}.feather'.format(selected_lineage, selected_total, selected_lineage, search_country, selected_total)
-        url2 = 'GISAID-Dataframes/{}/{}/{}_{}_2_Mintotal{}.feather'.format(selected_lineage, selected_total, selected_lineage, search_country, selected_total)
+        url1 = 'GISAID-Dataframes/{}/{}/{}_{}_1_Mintotal{}.feather'.format(selected_lineage, selected_total, selected_lineage, search_country.replace(" ", "_"), selected_total)
+        url2 = 'GISAID-Dataframes/{}/{}/{}_{}_2_Mintotal{}.feather'.format(selected_lineage, selected_total, selected_lineage, search_country.replace(" ", "_"), selected_total)
         pxdf1original = pd.read_feather(url1)
         pxdf2original = pd.read_feather(url2)
         
