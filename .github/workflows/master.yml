@@ -6,7 +6,8 @@ on:
       - master
     paths-ignore:
       - 'provision.sh'
-      - 'dataframegen.py'
+      - 'dataframegenpart1.py'
+      - 'dataframegenpart2.py'
       - 'deleteprovision.py'
       - 'splitprovision.py'
       - 'README.md'
