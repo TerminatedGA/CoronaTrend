@@ -9,10 +9,11 @@ The website is live at [coronatrend.live](https://coronatrend.live)
 Dataframes are generated using _provision.sh_.
 
 ## Sequence filtering criteria ##
-All SARS-CoV-2 sequences used in CoronaTrend meets the following criteria:
-Host: Human
-Sequencing Coverage: High
-Sequence is Complete: True
+All SARS-CoV-2 sequences used in CoronaTrend meets the following criteria:\
+
+Host: Human\
+Sequencing Coverage: High\
+Sequence is Complete: True\
 N Content: ≤5%
 
 ## Notes ##
