@@ -50,7 +50,7 @@ navbar = dbc.Navbar(
                            width=150),
                 ],
                 align="center",
-                className="g-0",
+                #className="g-0",
             ),
         dbc.NavbarToggler(id="navbar-toggler", n_clicks=0)
     ],
