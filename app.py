@@ -50,7 +50,7 @@ navbar = dbc.Navbar(
                            width=150),
                 ],
                 align="center",
-                no_gutters=True,
+                className="g-0",
             ),
         dbc.NavbarToggler(id="navbar-toggler", n_clicks=0)
     ],
@@ -399,9 +399,7 @@ def close_contact_modal(selected_open, selected_close):
     ],
 
     [Input("btn_sidebar", "n_clicks")],
-    [
-        State("side_click", "data"),
-    ]
+    [State("side_click", "data")]
 )
 def toggle_sidebar(n, nclick):
     if n:
