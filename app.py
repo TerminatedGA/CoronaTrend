@@ -2,10 +2,8 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 import natsort
 import dash
-from dash import dcc
+from dash import dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
-from dash import html
-from dash.dependencies import Input, Output, State
 import pandas as pd
 from collections import Counter
 from github import Github
