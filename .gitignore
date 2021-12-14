@@ -5,3 +5,4 @@ venv
 apikey.lic
 gitpush.py
 provision.json.xz
+GISAID-Dataframes/part1temp.feather

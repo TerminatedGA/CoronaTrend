@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import json
 from collections import Counter
 import re
