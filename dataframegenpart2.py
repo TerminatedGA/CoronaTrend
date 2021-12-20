@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import argparse
 from collections import Counter
 import pandas as pd
