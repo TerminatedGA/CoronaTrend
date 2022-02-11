@@ -95,7 +95,7 @@ lineagesorted = list(lineagedictsorted.keys())
 lineagelist1 = []
 url = 'https://www.cdc.gov/coronavirus/2019-ncov/variants/variant-info.html'
 lineagelist2 = uscdclineage(url)
-lineagelist2.extend(['B.1.36.27', 'B.1.36', 'B.1.214.2', 'B.1.466.2', 'B.1.619', 'B.1.620', 'B.1.1.63', 'B.1.1.318', 'B.1.1.519', 'B.1.1.523', 'B.1.1.529', 'C.1.2', 'C.36.3', 'C.37', 'R.1'])
+lineagelist2.extend(['B.1.36.27', 'B.1.36', 'B.1.214.2', 'B.1.466.2', 'B.1.619', 'B.1.620', 'B.1.1.63', 'B.1.1.318', 'B.1.1.519', 'B.1.1.523', 'C.1.2', 'C.36.3', 'C.37', 'R.1', 'BA.1', 'BA.1.1', 'BA.2', 'BA.3'])
 for lineage in lineagelist2:
     if lineage in lineagesorted:
         lineagelist1.append(lineage)
