@@ -121,8 +121,9 @@ mutationdf.to_feather('GISAID-Dataframes/part1temp.feather', compression="zstd",
 weeklist = None
 sequencelist = None
 lineagelist = None
-countrylist = None
 aalabellistlist = None
 
-metadata = pd.Series([lineagesorted])
+metadata = pd.Series([lineagesorted, len(countrylist)])
 metadata.to_pickle('GISAID-Dataframes/metadata.pickle', compression="gzip")
+
+countrylist = None
