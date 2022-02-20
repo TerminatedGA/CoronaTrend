@@ -30,7 +30,7 @@ server = app.server
 
 navbar = dbc.Navbar(
     id='navbar',
-    children=[
+    children=dbc.Container([
             # Use row and col to control vertical alignment of logo / brand
             dbc.Row(
                 [
@@ -53,7 +53,7 @@ navbar = dbc.Navbar(
                 #className="g-0",
             ),
         dbc.NavbarToggler(id="navbar-toggler", n_clicks=0)
-    ],
+    ]),
     color="#F5F7C3",
     dark=False,
     style={'height': 100}
@@ -252,7 +252,7 @@ sidebar = html.Div(id='filter-sidebar',
                    step=0.5)])])
 
 footer = html.Div(id='footer',
-                  children=[dbc.Navbar(children=[html.Div(children=[
+                  children=[dbc.Navbar(children=dbc.Container([html.Div(children=[
                           html.Button("Acknowledgements",
                                       id="acknowledgement-open-button",
                                       style={'display': 'inline-block', 
@@ -285,7 +285,7 @@ footer = html.Div(id='footer',
                                                       href="https://www.gisaid.org/registration/terms-of-use/")],
                                    style={'display': 'inline-block'})],
                                style={"fontSize": 13,
-                                      "textAlign": "center"})],
+                                      "textAlign": "center"})]),
                                style={"borderTop": "1px grey solid", 
                                       "textAlign": "center",
                                       "paddingTop": "20px", 
