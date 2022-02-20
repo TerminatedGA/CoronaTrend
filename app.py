@@ -115,7 +115,7 @@ content=html.Div(id='page-content',
                                     children='Last updated: ' + str(lastupdated) + ' (UTC +0)',
                                     style={'textAlign': 'left'}),
                            html.Div(id='last-updated',
-                                    children='Total sequences: ' + pd.read_pickle('GISAID-Dataframes/metadata.pickle', compression = "gzip")[1],
+                                    children='Total sequences: ' + str(pd.read_pickle('GISAID-Dataframes/metadata.pickle', compression = "gzip")[1]),
                                     style={'textAlign': 'left'}),
                            dcc.Interval(id='last-updated-interval',
                                         interval=10*60*1000, # in milliseconds
