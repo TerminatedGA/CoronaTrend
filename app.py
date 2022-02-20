@@ -252,7 +252,7 @@ sidebar = html.Div(id='filter-sidebar',
                    step=0.5)])])
 
 footer = html.Div(id='footer',
-                  children=[dbc.Navbar(children=dbc.Container([html.Div(children=[
+                  children=[dbc.Navbar(children=[html.Div(children=[
                           html.Button("Acknowledgements",
                                       id="acknowledgement-open-button",
                                       style={'display': 'inline-block', 
@@ -323,7 +323,7 @@ html.Div([
         				   ", on which this research is based.",
                            html.Br(),
                            html.Br(),
-                           html.Div([html.Div("1) Elbe, S., and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID’s innovative contribution to global health. Global Challenges, 1:33-46. DOI: ",
+                           html.Div([html.Div("1) Elbe, S., and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID’s innovative contribution to global health. Global Challenges, 1:33-46. DOI: ",
                                                style={'display': 'inline'}),
                                       dcc.Link("10.1002/gch2.1018",
                                                 target='_blank',
