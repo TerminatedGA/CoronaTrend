@@ -27,7 +27,7 @@ N Content: ≤5%
    
 ## Acknowledgements ##
 
-CoronaTrend is a project coordinated by Chan Tze To under the supervision of Dr. Kelvin To, along with assistance from Mr. Jonathan Ip.
+CoronaTrend is a project coordinated by Miss Chan Tze To (Lea) under the supervision of Dr. Kelvin To, along with assistance from Mr. Jonathan Ip.
 
 We gratefully acknowledge all data contributors, i.e. the Authors and their Originating laboratories responsible for obtaining the specimens, and their Submitting laboratories for generating the genetic sequence and metadata and sharing via the GISAID Initiative<sup>1</sup>, on which this research is based.
 
