@@ -36,7 +36,7 @@ We gratefully acknowledge all data contributors, i.e. the Authors and their Orig
 ## Contact ##
 All enquires regarding CoronaTrend can be sent to contact@coronatrend.live.
 
-Author: Chan Tze To\
+Author: Chan Tze To (Lea)\
 Email: tzetochan@connect.hku.hk 
 
 
