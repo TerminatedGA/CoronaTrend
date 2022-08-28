@@ -311,7 +311,7 @@ html.Div([
         html.Div(children=["CoronaTrend aims to be a public resource from the Department of Microbiology, Li Ka Shing Faculty of Medicine, The University of Hong Kong, detailing the prevalence of different mutations across different lineages as time passes. ", 
                            html.Br(),
                            html.Br(),
-                           "Developers: Mr. Chan Tze To, Mr. Jonathan Ip, Dr. Kelvin To"],
+                           "Developers: Miss Chan Tze To (Lea), Mr. Jonathan Ip, Dr. Kelvin To"],
                  style={'paddingBottom': 30}),
         html.Div(children='GISAID Initiative',
                  style={'color': 'black', 
