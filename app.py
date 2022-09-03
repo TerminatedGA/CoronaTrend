@@ -175,7 +175,7 @@ sidebar = html.Div(id='filter-sidebar',
                  style={'color': 'black', 'fontSize': 15}),
         dcc.Dropdown(id='lineage-dropdown',
                      options=[{'label': x, 'value': x} for x in pd.read_pickle('GISAID-Dataframes/metadata.pickle', compression = "gzip")[0]],
-                     value="BA.4",
+                     value="B.1.1.7",
                      clearable=False),
         dcc.Interval(id='lineage-dropdown-interval',
                      interval=10*60*1000, # in milliseconds
